@@ -34,8 +34,8 @@ run cleanly; `input()` is stubbed and the multiprocessing snippet's
 
 ## A note on formatting
 
-The sheet files are intentionally **title-free** (they don't start with an
-`# H1`) because they were written to paste directly into
-[Capacities](https://capacities.io/), which supplies the page title itself.
-On GitHub the titling and navigation live here in the README instead. If you
-ever make GitHub the canonical home, add an `# H1` to the top of each sheet.
+Each sheet opens with its own `# H1` title (`# Python: Cheat Sheet` and
+`# Python: Advanced Cheat Sheet`). The sheets were originally written to paste
+directly into [Capacities](https://capacities.io/), which supplies its own page
+title — so when pasting there you can drop the H1 if it would duplicate the
+page title.
