@@ -43,6 +43,36 @@ uv python install 3.14         # a specific minor -> newest patch
 
 # Pin a version for the current directory (writes .python-version)
 uv python pin 3.14
+
+# Pin the global default uv uses where no local .python-version exists
+uv python pin --global 3.14
+# Pinned `~/.config/uv/.python-version` to `3.14`
+uv python pin --global --rm   # remove the global pin
+```
+
+The global pin sets which Python uv defaults to (for `uv run`, `uv venv`, new
+projects). It does not change your shell's `python3` on PATH.
+
+### Make uv's Python your `python` / `python3`
+
+macOS ships only `python3` (the system build); there is no bare `python`, and
+a plain `uv python install` adds just a versioned `python3.14` shim. To get
+`python` and `python3` on PATH pointing at a uv build, install with `--default`:
+
+```bash
+uv python install 3.14 --default
+# warning: The `--default` option is experimental ...
+# Installed Python 3.14.5
+#  + cpython-3.14.5-macos-aarch64-none (python, python3)
+```
+
+This writes `python`, `python3`, and `python3.14` into `~/.local/bin`. They win
+only if `~/.local/bin` precedes `/usr/bin` on your PATH (the uv installer puts
+it there). Open a new shell, then:
+
+```bash
+which python    # ~/.local/bin/python
+python --version  # Python 3.14.5
 ```
 
 ## Create a project
@@ -107,6 +137,21 @@ uv remove requests        # remove a dependency (and its now-unused deps)
 uv sync                   # install exactly what the lockfile says
                           # (e.g. right after cloning a project)
 uv lock                   # re-resolve and refresh uv.lock
+```
+
+### Pin a specific version
+
+Pass a version specifier (PEP 508). Quote it so the shell doesn't interpret
+`<`, `>`, or `*`. Re-running `uv add` with a new spec just rewrites it.
+
+```bash
+uv add 'requests==2.31.0'     # exact pin
+uv add 'requests>=2.30,<3'    # range
+uv add 'requests~=2.31.0'     # compatible release (>=2.31.0, ==2.31.*)
+uv add --dev 'pytest>=9,<10'  # works for dev dependencies too
+
+# Upgrade one package later without editing the spec
+uv lock --upgrade-package requests
 ```
 
 `uv add` updates three things together: `pyproject.toml`, the `uv.lock`
