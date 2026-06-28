@@ -114,6 +114,9 @@ len(nums)            # length
 sorted(nums)         # new sorted list
 nums.reverse()       # reverse in place
 3 in nums            # membership test -> True/False
+
+# Indexing past the end raises (reads never auto-grow the list)
+# nums[99]           # IndexError: list index out of range
 ```
 
 ## Slicing
@@ -135,6 +138,9 @@ s[::-1]       # [9, 8, 7, ... 0]   reversed (step of -1)
 
 "hello"[::-1] # "olleh"            same syntax on strings
 
+# Out-of-range slices are forgiving (unlike indexing): they clamp
+s[2:100]      # [2, 3, 4, 5, 6, 7, 8, 9]   no IndexError, stops at the end
+
 # Slice assignment replaces a range (lists only)
 s[0:2] = [100]    # [100, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
@@ -145,16 +151,30 @@ s[0:2] = [100]    # [100, 2, 3, 4, 5, 6, 7, 8, 9]
 person = {"name": "Alice", "age": 30}
 
 person["name"]              # "Alice"
-person.get("email", "n/a")  # safe access with default
+# person["email"]          # KeyError: a missing key raises on [] access
+person.get("email")         # None    -> no error; None when key is missing
+person.get("email", "n/a")  # "n/a"   -> supply your own default
 person["email"] = "a@x.com" # add / update
-person.setdefault("age", 0) # set & return only if key is missing
 person.update({"age": 31})  # merge another dict in place
 del person["age"]           # delete a key
 person.pop("email")         # remove a key and return its value
-person.keys()               # all keys
-person.values()             # all values
-person.items()              # key/value pairs
-"name" in person            # check key exists
+"name" in person            # check key exists -> True
+
+# setdefault: return the value if the key exists; otherwise INSERT it
+# with the given default and return that. It can MUTATE the dict.
+d = {"a": 1}
+d.setdefault("a", 99)   # 1   -> "a" exists: returned as-is, d unchanged
+d.setdefault("b", 99)   # 99  -> "b" missing: d is now {"a": 1, "b": 99}
+
+# keys(), values(), items() return live VIEW objects, not lists.
+# Views are iterable and reflect later changes to the dict.
+scores = {"x": 1, "y": 2}
+ks = scores.keys()          # dict_keys(['x', 'y'])
+scores["z"] = 3
+list(ks)                    # ['x', 'y', 'z']  -> the view saw the change
+for key, val in scores.items():   # idiomatic way to iterate key/value pairs
+    print(key, val)
+list(scores.values())       # [1, 2, 3]  -> wrap in list() for a snapshot
 
 # Merge into a NEW dict with | (Python 3.9+)
 combined = {"a": 1} | {"b": 2}    # {"a": 1, "b": 2}
@@ -165,6 +185,8 @@ combined = {"a": 1} | {"b": 2}    # {"a": 1, "b": 2}
 ```python
 point = (3, 4)        # tuple (immutable)
 x, y = point          # unpacking
+point[0]              # 3    -> index like a list
+# point[5]            # IndexError: tuple index out of range
 
 s = {1, 2, 2, 3}      # set -> {1, 2, 3} (unique)
 s.add(4)
@@ -178,6 +200,36 @@ back = list(unique)       # set -> list: [1, 2, 3]
 
 # Common idiom: remove duplicates from a list
 deduped = list(set(nums)) # [1, 2, 3]  (note: order is NOT preserved)
+```
+
+## Operators
+
+```python
+# Comparison (relational) operators -> always return a bool
+2 == 2       # True    equal value
+2 != 3       # True    not equal
+3 > 2        # True    also <, >=, <=
+# Comparisons can be chained, like in maths
+x = 5
+1 < x < 10   # True    same as: 1 < x and x < 10
+
+# Logical operators
+True and False    # False   both sides must be truthy
+True or False     # True    at least one side truthy
+not True          # False   negation
+
+# GOTCHA: and/or return one of the OPERANDS, not a strict True/False,
+# and short-circuit (stop as soon as the result is known).
+"a" and "b"       # "b"          first is truthy -> yields the second
+0 or "fallback"   # "fallback"   first is falsy  -> yields the second
+"" or "default"   # "default"    common way to supply a default value
+
+# Identity vs equality
+a = [1, 2]
+b = [1, 2]
+a == b       # True    same contents
+a is b       # False   but NOT the same object in memory
+x is None    # the correct way to test for None (use `is`, not `==`)
 ```
 
 ## Conditionals
@@ -532,6 +584,28 @@ area(3, 4)           # 12
 # For "overloading"-like flexibility, use defaults or *args/**kwargs instead.
 ```
 
+### Nested Functions & Closures
+
+```python
+# A function can be defined INSIDE another function. The inner one is
+# local to the outer and can read the outer's variables (a closure).
+def make_counter(start=0):
+    count = start
+    def increment():
+        nonlocal count       # rebind the ENCLOSING variable (not a global)
+        count += 1
+        return count
+    return increment         # return the inner function itself
+
+counter = make_counter()
+counter()    # 1
+counter()    # 2   -> count persists between calls, captured by the closure
+
+# Reading an enclosing variable needs nothing special; only REBINDING it
+# requires `nonlocal` (otherwise the assignment makes a new local instead).
+# The same works inside a method: a def there is just a local helper.
+```
+
 ## Decorators
 
 A decorator is a function that wraps another function to add behavior,
@@ -622,6 +696,22 @@ Amphibian.__mro__     # the Method Resolution Order Python follows
 # Empty class placeholder (pass = do nothing)
 class Empty:
     pass
+```
+
+### Nested Classes
+
+```python
+# Yes: a class can be defined inside another class. The inner class is
+# just an attribute of the outer one (accessed as Outer.Inner) and gets
+# NO special access to the outer class or its instances.
+class Outer:
+    class Inner:              # a nested type, namespaced under Outer
+        def hello(self):
+            return "hi from Inner"
+
+Outer.Inner                  # the nested class object
+inner = Outer.Inner()        # instantiate via the outer's namespace
+inner.hello()                # "hi from Inner"
 ```
 
 ### Instance, Class & Static Methods
