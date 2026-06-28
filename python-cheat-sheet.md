@@ -205,6 +205,17 @@ deduped = list(set(nums)) # [1, 2, 3]  (note: order is NOT preserved)
 ## Operators
 
 ```python
+# Arithmetic operators
+7 + 2        # 9
+7 - 2        # 5
+7 * 2        # 14
+7 / 2        # 3.5    true division ALWAYS returns a float
+7 // 2       # 3      floor division (rounds DOWN to a whole number)
+7 % 2        # 1      modulo (the remainder)
+7 ** 2       # 49     exponentiation (power)
+-7 // 2      # -4     floor rounds toward -infinity, NOT toward zero
+divmod(7, 2) # (3, 1) quotient and remainder together
+
 # Comparison (relational) operators -> always return a bool
 2 == 2       # True    equal value
 2 != 3       # True    not equal
@@ -364,9 +375,19 @@ for i in range(3):  # most common use: repeat / index
 
 ```python
 nums = [1, 2, 3, 4]
-squares = [n**2 for n in range(5)]        # [0,1,4,9,16]
-evens   = [n for n in nums if n % 2 == 0] # filter
-lookup  = {n: n**2 for n in range(3)}     # dict comprehension
+
+# List comprehension -> [...]: build a new list from an iterable
+squares = [n**2 for n in range(5)]        # [0, 1, 4, 9, 16]
+# List comprehension with a filter (the trailing `if`)
+evens   = [n for n in nums if n % 2 == 0] # [2, 4]  -> keeps only evens
+# Dict comprehension -> {key: value ...}: build a new dict
+lookup  = {n: n**2 for n in range(3)}     # {0: 0, 1: 1, 2: 4}
+# Set comprehension -> {...}: build a new set (unique values)
+sizes   = {len(w) for w in ["hi", "ok", "hey"]}  # {2, 3}
+
+# There is NO tuple comprehension: (n for n in nums) is a GENERATOR
+# expression, not a tuple. Build a tuple explicitly with tuple(...):
+nums_t  = tuple(n * 2 for n in nums)      # (2, 4, 6, 8)
 ```
 
 ## Generators
@@ -604,6 +625,16 @@ counter()    # 2   -> count persists between calls, captured by the closure
 # Reading an enclosing variable needs nothing special; only REBINDING it
 # requires `nonlocal` (otherwise the assignment makes a new local instead).
 # The same works inside a method: a def there is just a local helper.
+
+# Scope rules (LEGB): a name is looked up Local -> Enclosing -> Global ->
+# Built-in. Use `nonlocal x` to rebind an enclosing variable, and
+# `global x` to rebind a top-level (module) variable from inside a function.
+count = 0
+def bump():
+    global count        # without this, `count = ...` would make a new local
+    count += 1
+bump()
+count                   # 1
 ```
 
 ## Decorators
