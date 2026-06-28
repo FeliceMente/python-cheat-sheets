@@ -5,7 +5,7 @@ failing if any block raises. This is the same discipline used while the
 sheets were written: every snippet must actually run.
 
 Usage:
-    python test_blocks.py                      # checks both default sheets
+    python test_blocks.py                      # checks all default sheets
     python test_blocks.py path/to/file.md ...  # checks the given files
 
 Exit code is non-zero if any block fails, so it works as a CI gate.
@@ -22,6 +22,7 @@ import tempfile
 import traceback
 
 DEFAULT_FILES = [
+    "python-cheat-sheet-getting-started.md",
     "python-cheat-sheet.md",
     "python-cheat-sheet-advanced.md",
 ]
