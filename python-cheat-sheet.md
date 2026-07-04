@@ -161,6 +161,10 @@ person["email"] = "a@x.com" # add / update
 person.update({"age": 31})  # merge another dict in place
 del person["age"]           # delete a key
 person.pop("email")         # remove a key and return its value
+# Deleting a MISSING key raises, just like reading one:
+# del person["email"]       # KeyError
+# person.pop("email")       # KeyError
+person.pop("email", "n/a")  # "n/a" -> pop with a default never raises
 "name" in person            # check key exists -> True
 
 # setdefault: return the value if the key exists; otherwise INSERT it
