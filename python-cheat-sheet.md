@@ -1063,7 +1063,7 @@ from mytools import text as t   # import the module with an alias
 t.shout("hi")                   # "HI!"
 ```
 
-### A Fuller Package
+### Package with Subpackages
 
 A package can hold **many modules** and also **other packages** (subpackages,
 each with its own `__init__.py`), nesting as deep as needed:
