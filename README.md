@@ -10,12 +10,12 @@ dependencies.
 
 ## The sheets
 
-| Sheet | Level | Contents |
-|-------|-------|----------|
-| [`python-cheat-sheet-getting-started.md`](python-cheat-sheet-getting-started.md) | Getting started | Getting Python, the REPL, running a script, indentation & code blocks, comments, output/input & casting, reading a traceback, getting help, and a first taste of variables, types, lists, selection, iteration, functions, and classes |
-| [`python-cheat-sheet.md`](python-cheat-sheet.md) | Basics | Types & dynamic typing, printing, strings (literals, methods, f-string formatting), lists, slicing, dicts, tuples/sets, conditionals, ternary & walrus, match/case, truthy/falsy, loops, range, comprehensions, generators, functions, decorators, classes (single & multiple inheritance, dunders, duck typing), error handling, files, modules |
-| [`python-cheat-sheet-advanced.md`](python-cheat-sheet-advanced.md) | Intermediate / advanced | Type hints, private attributes & name mangling, properties, dynamic attributes, introspection, abstract base classes, the iterator protocol, dataclasses, enums, `__repr__`/`__str__`, threading & the GIL, multiprocessing, async/await, `pathlib` |
-| [`uv-cheat-sheet.md`](uv-cheat-sheet.md) | Tooling | Installing uv on macOS, managing Python versions, creating projects, running code, adding/removing dependencies, coming from pip/venv |
+| Sheet | Level | Contents | PDF |
+|-------|-------|----------|-----|
+| [`python-cheat-sheet-getting-started.md`](python-cheat-sheet-getting-started.md) | Getting started | Getting Python, the REPL, running a script, indentation & code blocks, comments, output/input & casting, reading a traceback, getting help, and a first taste of variables, types, lists, selection, iteration, functions, and classes | [PDF](pdf/python-cheat-sheet-getting-started.pdf) |
+| [`python-cheat-sheet.md`](python-cheat-sheet.md) | Basics | Types & dynamic typing, printing, strings (literals, methods, f-string formatting), lists, slicing, dicts, tuples/sets, conditionals, ternary & walrus, match/case, truthy/falsy, loops, range, comprehensions, generators, functions, decorators, classes (single & multiple inheritance, dunders, duck typing), error handling, files, modules | [PDF](pdf/python-cheat-sheet.pdf) |
+| [`python-cheat-sheet-advanced.md`](python-cheat-sheet-advanced.md) | Intermediate / advanced | Type hints, private attributes & name mangling, properties, dynamic attributes, introspection, abstract base classes, the iterator protocol, dataclasses, enums, `__repr__`/`__str__`, threading & the GIL, multiprocessing, async/await, `pathlib` | [PDF](pdf/python-cheat-sheet-advanced.pdf) |
+| [`uv-cheat-sheet.md`](uv-cheat-sheet.md) | Tooling | Installing uv on macOS, managing Python versions, creating projects, running code, adding/removing dependencies, coming from pip/venv | [PDF](pdf/uv-cheat-sheet.pdf) |
 
 ## Tested examples
 
@@ -40,3 +40,14 @@ A small sandbox is set up automatically (a temp working directory plus a
 generated `mymath.py`) so the file-I/O and "import your own module" snippets
 run cleanly; `input()` is stubbed and the multiprocessing snippet's
 `__main__` guard keeps it inert under the test runner.
+
+## PDF versions
+
+Each sheet has a PDF version in [`pdf/`](pdf/), linked from the table above.
+The PDFs are generated from the markdown by
+[`generate_pdfs.py`](generate_pdfs.py) — regenerate them whenever a sheet
+changes:
+
+```bash
+uv run --with markdown-pdf --with linkify-it-py python generate_pdfs.py
+```
