@@ -322,6 +322,49 @@ match point:
         print(f"on the y-axis at {y}")
     case (x, y):
         print(f"at {x}, {y}")
+
+# GOTCHA: a bare name in a case is a CAPTURE, not a comparison.
+# It matches ANYTHING and binds it to that name — it does NOT compare
+# against an existing variable called `expected`:
+expected = "stop"
+match "anything":
+    case expected:                # always matches; expected is rebound!
+        print(expected)           # "anything"
+
+# A DOTTED name, however, IS compared as a constant:
+class Command:
+    STOP = "stop"
+
+match "stop":
+    case Command.STOP:            # attribute access -> real comparison
+        print("stopping")
+
+# Guard: attach a condition to a pattern with `if`
+match (4, 4):
+    case (x, y) if x == y:        # pattern must match AND guard be true
+        print(f"on the diagonal at {x}")
+    case (x, y):
+        print("elsewhere")
+
+# Sequence pattern: destructure a list; * collects the rest
+match [1, 2, 3, 4]:
+    case [first, *rest]:
+        print(first, rest)        # 1 [2, 3, 4]
+
+# Mapping pattern: matches if these KEYS exist (extra keys are fine)
+match {"action": "move", "x": 10}:
+    case {"action": act}:
+        print(act)                # "move"
+
+# Class pattern: match on the type and its attribute values
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+match Point(0, 7):
+    case Point(x=0, y=y):         # an instance of Point with x == 0
+        print(f"on the y-axis at {y}")
 ```
 
 ## Loops
