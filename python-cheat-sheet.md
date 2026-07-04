@@ -478,6 +478,28 @@ def todo_later():
     pass
 ```
 
+### Docstrings
+
+```python
+# A docstring is a string literal (triple-quoted by convention) placed as
+# the FIRST statement of a function, class, or module. Python stores it
+# as the object's documentation — it is what help() and editors show.
+def area(width, height):
+    """Return the area of a rectangle."""
+    return width * height
+
+class Dog:
+    """A pet that can bark.
+
+    Docstrings can span multiple lines: a one-line summary first,
+    then details after a blank line.
+    """
+
+area.__doc__      # 'Return the area of a rectangle.'
+Dog.__doc__       # 'A pet that can bark.\n\n    Docstrings can span...'
+# help(area)      # pretty-prints the docstring
+```
+
 ### Define Before You Call
 
 A name must exist by the time the line that uses it **runs** — not by where
