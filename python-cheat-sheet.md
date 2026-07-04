@@ -115,6 +115,9 @@ sorted(nums)         # new sorted list
 nums.reverse()       # reverse in place
 3 in nums            # membership test -> True/False
 
+# Elements don't have to share a type — any mix is fine (heterogeneous)
+mixed = [1, "two", 3.0, True, [4, 5]]   # even other lists
+
 # Indexing past the end raises (reads never auto-grow the list)
 # nums[99]           # IndexError: list index out of range
 ```
@@ -187,6 +190,9 @@ point = (3, 4)        # tuple (immutable)
 x, y = point          # unpacking
 point[0]              # 3    -> index like a list
 # point[5]            # IndexError: tuple index out of range
+
+# Tuples mix types too — the classic use: a fixed-shape record
+user = ("Alice", 30, True)    # name, age, active
 
 s = {1, 2, 2, 3}      # set -> {1, 2, 3} (unique)
 s.add(4)
