@@ -4,9 +4,9 @@ Extract every ```python code block from the cheat sheets and execute it,
 failing if any block raises. This is the same discipline used while the
 sheets were written: every snippet must actually run.
 
-Usage:
-    python test_blocks.py                      # checks all default sheets
-    python test_blocks.py path/to/file.md ...  # checks the given files
+Usage (any working directory):
+    python scripts/test_blocks.py                      # checks all default sheets
+    python scripts/test_blocks.py path/to/file.md ...  # checks the given files
 
 Exit code is non-zero if any block fails, so it works as a CI gate.
 Standard library only -- no dependencies to install.
@@ -20,6 +20,9 @@ import signal
 import sys
 import tempfile
 import traceback
+
+# The sheets live in the repo root: this script's parent directory.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEFAULT_FILES = [
     "python-cheat-sheet-getting-started.md",
@@ -98,6 +101,9 @@ def run_file(path, work):
 
 def main(argv):
     files = argv[1:] or DEFAULT_FILES
+    # Explicit arguments resolve from the caller's directory; the default
+    # sheets resolve from the repo root, wherever the script is run from.
+    base = os.getcwd() if argv[1:] else REPO_ROOT
     signal.signal(signal.SIGALRM, _timeout_handler)
     work = make_sandbox()
     prev_cwd = os.getcwd()
@@ -108,7 +114,7 @@ def main(argv):
     total_failures = 0
     try:
         for path in files:
-            abspath = os.path.join(prev_cwd, path) if not os.path.isabs(path) else path
+            abspath = os.path.join(base, path) if not os.path.isabs(path) else path
             if not os.path.exists(abspath):
                 print(f"SKIP {path}: not found")
                 continue

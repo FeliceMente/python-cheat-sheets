@@ -18,4 +18,4 @@ jobs:
           python-version: "3.14"
 
       - name: Run every Python block in the cheat sheets
-        run: python test_blocks.py
+        run: python scripts/test_blocks.py

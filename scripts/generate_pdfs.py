@@ -2,8 +2,8 @@
 """
 Render each cheat sheet to a PDF in the pdf/ directory.
 
-Usage:
-    uv run --with markdown-pdf --with linkify-it-py python generate_pdfs.py
+Usage (any working directory):
+    uv run --with markdown-pdf --with linkify-it-py python scripts/generate_pdfs.py
 
 linkify-it-py is required by the gfm-like markdown mode used for tables.
 
@@ -18,6 +18,9 @@ from pathlib import Path
 
 from markdown_pdf import MarkdownPdf, Section
 
+# The sheets live in the repo root: this script's parent directory.
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 SHEETS = [
     "python-cheat-sheet-getting-started.md",
     "python-cheat-sheet.md",
@@ -25,7 +28,7 @@ SHEETS = [
     "uv-cheat-sheet.md",
 ]
 
-OUT_DIR = Path("pdf")
+OUT_DIR = REPO_ROOT / "pdf"
 
 # Minimal styling: readable code blocks, visible table borders, compact
 # headings. The sheets are mostly code, so code legibility comes first.
@@ -59,7 +62,7 @@ def build_pdf(sheet: Path, out_file: Path) -> None:
 
 
 def main() -> int:
-    missing = [s for s in SHEETS if not Path(s).exists()]
+    missing = [s for s in SHEETS if not (REPO_ROOT / s).exists()]
     if missing:
         for name in missing:
             print(f"ERROR: {name} not found", file=sys.stderr)
@@ -68,8 +71,8 @@ def main() -> int:
     OUT_DIR.mkdir(exist_ok=True)
     for name in SHEETS:
         out_file = OUT_DIR / (Path(name).stem + ".pdf")
-        build_pdf(Path(name), out_file)
-        print(f"{name} -> {out_file}")
+        build_pdf(REPO_ROOT / name, out_file)
+        print(f"{name} -> pdf/{out_file.name}")
     return 0
 
 

@@ -20,7 +20,7 @@ dependencies.
 ## Tested examples
 
 Every fenced ` ```python ` block in the three Python sheets is extracted and
-run by [`test_blocks.py`](test_blocks.py) on Python 3.14 (the version CI uses;
+run by [`scripts/test_blocks.py`](scripts/test_blocks.py) on Python 3.14 (the version CI uses;
 the examples assume Python 3.10+). The inline comments showing results
 (e.g. `# [1, 4, 9, 16]`) reflect real output. REPL transcripts and tracebacks
 in the getting-started sheet use ` ```text ` fences, so they are shown but not
@@ -31,8 +31,8 @@ runs by hand.
 Run the checks locally — no dependencies, standard library only:
 
 ```bash
-python test_blocks.py                 # all three Python sheets
-python test_blocks.py some-file.md    # a specific file
+python scripts/test_blocks.py                 # all three Python sheets
+python scripts/test_blocks.py some-file.md    # a specific file
 ```
 
 The script exits non-zero if any block raises, which is how CI gates changes.
@@ -46,9 +46,9 @@ test runner.
 
 Each sheet has a PDF version in [`pdf/`](pdf/), linked from the table above.
 The PDFs are generated from the markdown by
-[`generate_pdfs.py`](generate_pdfs.py) — regenerate them whenever a sheet
+[`scripts/generate_pdfs.py`](scripts/generate_pdfs.py) — regenerate them whenever a sheet
 changes:
 
 ```bash
-uv run --with markdown-pdf --with linkify-it-py python generate_pdfs.py
+uv run --with markdown-pdf --with linkify-it-py python scripts/generate_pdfs.py
 ```
