@@ -382,8 +382,35 @@ for i in range(5):       # 0,1,2,3,4
 for i, val in enumerate(nums):   # index + value
     print(i, val)
 
+for i, val in enumerate(nums, start=1):   # count from 1 instead of 0
+    print(i, val)
+
+# zip: iterate two (or more) sequences in PARALLEL
+names = ["Alice", "Bob"]
+ages = [30, 25]
+for name, age in zip(names, ages):
+    print(name, age)     # Alice 30 / Bob 25  (stops at the shorter one)
+
+# reversed: iterate backwards (works on lists, tuples, ranges, strings)
+for n in reversed(nums):
+    print(n)             # 3, 2, 1
+
+# Iterating a dict yields its KEYS; use .items() for key/value pairs
+person = {"name": "Alice", "age": 30}
+for key in person:
+    print(key, person[key])
+for key, val in person.items():      # see Dictionaries
+    print(key, val)
+
 while x > 0:
     x -= 1
+
+# Python has NO do-while; the idiom is `while True` + a break inside
+count = 0
+while True:
+    count += 1
+    if count == 3:
+        break            # the exit condition sits inside the body
 
 # break    -> exits the loop early
 # continue -> skips to the next iteration
@@ -404,6 +431,21 @@ for n in nums:
         break
 else:
     print("no negatives found")   # runs only if no break occurred
+
+# GOTCHA: never modify a list WHILE looping over it — removals shift
+# the elements and the loop silently SKIPS some:
+doomed = [1, 2, 3, 4]
+for n in doomed:
+    doomed.remove(n)     # tries to empty the list...
+doomed                   # [2, 4]  -> half survived!
+
+# Fix: loop over a COPY, or build a new list with a comprehension
+items = [1, 2, 3, 4]
+for n in items[:]:       # [:] makes a copy to iterate
+    if n % 2 == 0:
+        items.remove(n)
+items                    # [1, 3]
+evens_removed = [n for n in [1, 2, 3, 4] if n % 2 != 0]   # [1, 3]
 ```
 
 ## Range
