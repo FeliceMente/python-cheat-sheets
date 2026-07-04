@@ -37,9 +37,10 @@ python test_blocks.py some-file.md    # a specific file
 
 The script exits non-zero if any block raises, which is how CI gates changes.
 A small sandbox is set up automatically (a temp working directory plus a
-generated `mymath.py`) so the file-I/O and "import your own module" snippets
-run cleanly; `input()` is stubbed and the multiprocessing snippet's
-`__main__` guard keeps it inert under the test runner.
+generated `mymath.py` module and `mytools/` package) so the file-I/O and
+"import your own module/package" snippets run cleanly; `input()` is stubbed
+and the multiprocessing snippet's `__main__` guard keeps it inert under the
+test runner.
 
 ## PDF versions
 

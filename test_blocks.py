@@ -45,8 +45,9 @@ def _fake_input(prompt=""):
 
 
 def make_sandbox():
-    """A temp working dir + a real `mymath.py` so the 'import your own
-    module' snippet resolves, and so file snippets write somewhere safe."""
+    """A temp working dir + a real `mymath.py` and `mytools/` package so
+    the 'import your own module/package' snippets resolve, and so file
+    snippets write somewhere safe."""
     work = tempfile.mkdtemp(prefix="cheatsheet_blocks_")
     with open(os.path.join(work, "mymath.py"), "w") as f:
         f.write(
@@ -54,6 +55,19 @@ def make_sandbox():
             "def square(n):\n    return n * n\n"
             "def cube(n):\n    return n * n * n\n"
         )
+    pkg = os.path.join(work, "mytools")
+    sub = os.path.join(pkg, "formats")
+    os.makedirs(sub, exist_ok=True)
+    with open(os.path.join(pkg, "__init__.py"), "w") as f:
+        f.write('from .text import shout\nVERSION = "1.0"\n')
+    with open(os.path.join(pkg, "text.py"), "w") as f:
+        f.write('def shout(s):\n    return s.upper() + "!"\n')
+    with open(os.path.join(pkg, "numbers.py"), "w") as f:
+        f.write("def double(n):\n    return n * 2\n")
+    with open(os.path.join(sub, "__init__.py"), "w") as f:
+        f.write("")
+    with open(os.path.join(sub, "csv.py"), "w") as f:
+        f.write('def to_row(items):\n    return ",".join(items)\n')
     return work
 
 

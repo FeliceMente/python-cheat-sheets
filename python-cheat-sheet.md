@@ -1032,3 +1032,74 @@ mm.cube(3)           # 27
 if __name__ == "__main__":
     print(square(5))
 ```
+
+## Packages (Folders of Modules)
+
+A **module** is a single `.py` file; a **package** is a folder of modules
+containing an `__init__.py` file (often empty — it marks the folder as a
+package and runs on first import):
+
+```text
+mytools/              # the package
+├── __init__.py       # makes the folder importable (can be empty)
+└── text.py           # a module inside the package
+```
+
+```python
+# mytools/text.py
+def shout(s):
+    return s.upper() + "!"
+```
+
+```python
+# Import through the package with dotted names
+import mytools.text
+mytools.text.shout("hi")        # "HI!"
+
+from mytools.text import shout  # import a specific name
+shout("hi")                     # "HI!"
+
+from mytools import text as t   # import the module with an alias
+t.shout("hi")                   # "HI!"
+```
+
+### A Fuller Package
+
+A package can hold **many modules** and also **other packages** (subpackages,
+each with its own `__init__.py`), nesting as deep as needed:
+
+```text
+mytools/
+├── __init__.py       # runs ONCE, on first import of mytools
+├── text.py
+├── numbers.py        # a package holds any number of modules
+└── formats/          # a SUBPACKAGE: packages nest
+    ├── __init__.py
+    └── csv.py
+```
+
+`__init__.py` may be empty, but it can contain any code — it runs once, when
+the package is first imported. Typical contents: package-level constants,
+and re-exports that give users a shorter import path:
+
+```python
+# mytools/__init__.py
+# (shown commented: `.text` is a RELATIVE import — the leading dot means
+# "from this same package", so the line only runs inside the package)
+# from .text import shout    # re-export: lift a name to the package level
+# VERSION = "1.0"            # package-level constant
+```
+
+```python
+import mytools
+mytools.VERSION                  # "1.0"
+mytools.shout("hi")              # "HI!"  -> usable without naming .text,
+                                 #           thanks to the re-export
+
+# Reach into a subpackage with the full dotted path
+from mytools.formats.csv import to_row
+to_row(["a", "b", "c"])          # "a,b,c"
+
+import mytools.numbers
+mytools.numbers.double(21)       # 42
+```
