@@ -230,7 +230,8 @@ divmod(7, 2) # (3, 1) quotient and remainder together
 2 == 2       # True    equal value
 2 != 3       # True    not equal
 3 > 2        # True    also <, >=, <=
-# Comparisons can be chained, like in maths
+# Comparisons can be chained, like in maths — most languages can't do
+# this (in Java/C, 1 < x < 10 means (1 < x) < 10: a bool vs a number)
 x = 5
 1 < x < 10   # True    same as: 1 < x and x < 10
 
