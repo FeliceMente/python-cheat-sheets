@@ -280,7 +280,14 @@ c = a           # an alias: c and a are two names for the SAME list
 a == b          # True    equal contents (value comparison)
 a is b          # False   two distinct objects, however equal
 a is c          # True    one object, two names
+
+# id() returns that identity: an int unique to the object for its whole
+# lifetime (in CPython it's the memory address). `is` compares ids.
+# Identity is assigned by the interpreter, not the class: there is no
+# dunder to implement or override for it (unlike ==, which calls __eq__).
+id(a)           # e.g. 4344961088 — some int; different on every run
 id(a) == id(c)  # True    what `is` actually checks: the same identity
+id(a) == id(b)  # False   equal lists, but two different objects
 
 # Use `is` ONLY for singletons like None — never to compare values.
 # (Caching of small ints/strings can make `is` LOOK like == by accident.)
