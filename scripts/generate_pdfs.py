@@ -38,6 +38,12 @@ SHEETS = [
 
 OUT_DIR = REPO_ROOT / "pdf"
 
+REPO_URL = "https://github.com/FeliceMente/python-cheat-sheets"
+
+FOOTER_FONT = "helv"
+FOOTER_SIZE = 8
+FOOTER_GRAY = (0.45, 0.45, 0.45)
+
 # Minimal styling: readable code blocks, visible table borders, compact
 # headings. The sheets are mostly code, so code legibility comes first.
 CSS = """
@@ -101,6 +107,30 @@ def _split_before(md_text: str, titles: set) -> list:
     return parts
 
 
+def _add_footers(pdf_file: Path) -> None:
+    """Stamp the repo URL (clickable, bottom-left) and a page/total count
+    (bottom-right) into the margin of every page."""
+    with pymupdf.open(pdf_file) as doc:
+        total = doc.page_count
+        for page in doc:
+            y = page.rect.height - 18
+            page.insert_text((36, y), REPO_URL, fontname=FOOTER_FONT,
+                             fontsize=FOOTER_SIZE, color=FOOTER_GRAY)
+            url_w = pymupdf.get_text_length(REPO_URL, fontname=FOOTER_FONT,
+                                            fontsize=FOOTER_SIZE)
+            page.insert_link({"kind": pymupdf.LINK_URI, "uri": REPO_URL,
+                              "from": pymupdf.Rect(36, y - FOOTER_SIZE,
+                                                   36 + url_w, y + 2)})
+            label = f"{page.number + 1}/{total}"
+            label_w = pymupdf.get_text_length(label, fontname=FOOTER_FONT,
+                                              fontsize=FOOTER_SIZE)
+            page.insert_text((page.rect.width - 36 - label_w, y), label,
+                             fontname=FOOTER_FONT, fontsize=FOOTER_SIZE,
+                             color=FOOTER_GRAY)
+        doc.save(pdf_file, incremental=True,
+                 encryption=pymupdf.PDF_ENCRYPT_KEEP)
+
+
 def build_pdf(sheet: Path, out_file: Path) -> None:
     text = sheet.read_text(encoding="utf-8")
     known = _headings(text)
@@ -116,8 +146,9 @@ def build_pdf(sheet: Path, out_file: Path) -> None:
         pdf.save(out_file)
         new_orphans = _orphan_headings(out_file, known) - breaks
         if not new_orphans:
-            return
+            break
         breaks |= new_orphans
+    _add_footers(out_file)
 
 
 def main() -> int:
