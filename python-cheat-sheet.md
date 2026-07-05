@@ -237,6 +237,63 @@ back = list(unique)       # set -> list: [1, 2, 3]
 deduped = list(set(nums)) # [1, 2, 3]  (note: order is NOT preserved)
 ```
 
+## Mutability & References
+
+Python has no value-type vs reference-type split (unlike Java/C#): **every**
+variable holds a reference to an object. What actually matters is whether the
+object is **mutable** (list, dict, set) or **immutable** (int, float, bool,
+str, bytes, tuple).
+
+```python
+# Assignment NEVER copies — it gives the SAME object another name
+a = [1, 2, 3]
+b = a                 # b is an ALIAS of a, not a copy
+b.append(4)
+a                     # [1, 2, 3, 4] -> the change shows through a too
+a is b                # True   (one object, two names)
+
+# "Immutable" means the OBJECT itself can never change after creation.
+# There is no way to turn the int 10 into an 11: operations that look
+# like changes actually build a NEW object and REBIND the name to it.
+x = 10
+y = x                 # x and y -> the same int object (the 10)
+x is y                # True
+y += 1                # no mutation: creates a NEW int 11, rebinds y to it
+x                     # 10    -> the 10 object was never touched
+x is y                # False -> the names now point to different objects
+
+# Strings work the same way: every "modification" is a new object
+s = "hi"
+t = s
+t += "!"              # t now points to a NEW string "hi!"
+s                     # "hi"  -> original untouched (strings can't change)
+
+# So aliasing an immutable object is always harmless — nothing can
+# alter it through EITHER name. That's why int/float/bool/str/bytes/
+# tuple behave like Java/C# "value types", despite being references.
+
+# Copy a list when you need independence
+c = a.copy()          # or a[:] or list(a) -> a NEW list
+c.append(99)
+a                     # [1, 2, 3, 4]  -> unaffected
+
+# GOTCHA: those copies are SHALLOW — nested objects are still shared
+grid = [[1, 2], [3, 4]]
+flat = grid.copy()
+flat[0].append(99)
+grid                  # [[1, 2, 99], [3, 4]] -> inner list was shared!
+# copy.deepcopy (from the copy module) copies every level instead.
+
+# Arguments are passed the same way: the function receives a REFERENCE,
+# so mutating a passed-in list changes the caller's list
+def add_item(lst):
+    lst.append("x")
+
+data = [1]
+add_item(data)
+data                  # [1, 'x']
+```
+
 ## Operators
 
 ```python
