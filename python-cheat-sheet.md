@@ -237,6 +237,57 @@ back = list(unique)       # set -> list: [1, 2, 3]
 deduped = list(set(nums)) # [1, 2, 3]  (note: order is NOT preserved)
 ```
 
+## Operators
+
+```python
+# Arithmetic operators
+7 + 2        # 9
+7 - 2        # 5
+7 * 2        # 14
+7 / 2        # 3.5    true division ALWAYS returns a float
+7 // 2       # 3      floor division (rounds DOWN to a whole number)
+7 % 2        # 1      modulo (the remainder)
+7 ** 2       # 49     exponentiation (power)
+-7 // 2      # -4     floor rounds toward -infinity, NOT toward zero
+divmod(7, 2) # (3, 1) quotient and remainder together
+
+# Comparison (relational) operators -> always return a bool
+2 == 2       # True    equal value
+2 != 3       # True    not equal
+3 > 2        # True    also <, >=, <=
+# Comparisons can be chained, like in maths — most languages can't do
+# this (in Java/C, 1 < x < 10 means (1 < x) < 10: a bool vs a number)
+x = 5
+1 < x < 10   # True    same as: 1 < x and x < 10
+
+# Logical operators
+True and False    # False   both sides must be truthy
+True or False     # True    at least one side truthy
+not True          # False   negation
+
+# GOTCHA: and/or return one of the OPERANDS, not a strict True/False,
+# and short-circuit (stop as soon as the result is known).
+"a" and "b"       # "b"          first is truthy -> yields the second
+0 or "fallback"   # "fallback"   first is falsy  -> yields the second
+"" or "default"   # "default"    common way to supply a default value
+
+# Identity vs equality: == asks "equal VALUE?", is asks "the SAME object?"
+# Every object lives at one identity (see id()); `is` returns True only
+# when both sides are literally that one object, never comparing contents.
+a = [1, 2]
+b = [1, 2]      # a second, separate list that happens to have equal contents
+c = a           # an alias: c and a are two names for the SAME list
+a == b          # True    equal contents (value comparison)
+a is b          # False   two distinct objects, however equal
+a is c          # True    one object, two names
+id(a) == id(c)  # True    what `is` actually checks: the same identity
+
+# Use `is` ONLY for singletons like None — never to compare values.
+# (Caching of small ints/strings can make `is` LOOK like == by accident.)
+x = None
+x is None       # True    the correct way to test for None (not ==)
+```
+
 ## Mutability & References
 
 Python has no value-type vs reference-type split (unlike Java/C#): **every**
@@ -292,48 +343,6 @@ def add_item(lst):
 data = [1]
 add_item(data)
 data                  # [1, 'x']
-```
-
-## Operators
-
-```python
-# Arithmetic operators
-7 + 2        # 9
-7 - 2        # 5
-7 * 2        # 14
-7 / 2        # 3.5    true division ALWAYS returns a float
-7 // 2       # 3      floor division (rounds DOWN to a whole number)
-7 % 2        # 1      modulo (the remainder)
-7 ** 2       # 49     exponentiation (power)
--7 // 2      # -4     floor rounds toward -infinity, NOT toward zero
-divmod(7, 2) # (3, 1) quotient and remainder together
-
-# Comparison (relational) operators -> always return a bool
-2 == 2       # True    equal value
-2 != 3       # True    not equal
-3 > 2        # True    also <, >=, <=
-# Comparisons can be chained, like in maths — most languages can't do
-# this (in Java/C, 1 < x < 10 means (1 < x) < 10: a bool vs a number)
-x = 5
-1 < x < 10   # True    same as: 1 < x and x < 10
-
-# Logical operators
-True and False    # False   both sides must be truthy
-True or False     # True    at least one side truthy
-not True          # False   negation
-
-# GOTCHA: and/or return one of the OPERANDS, not a strict True/False,
-# and short-circuit (stop as soon as the result is known).
-"a" and "b"       # "b"          first is truthy -> yields the second
-0 or "fallback"   # "fallback"   first is falsy  -> yields the second
-"" or "default"   # "default"    common way to supply a default value
-
-# Identity vs equality
-a = [1, 2]
-b = [1, 2]
-a == b       # True    same contents
-a is b       # False   but NOT the same object in memory
-x is None    # the correct way to test for None (use `is`, not `==`)
 ```
 
 ## Conditionals
