@@ -98,6 +98,31 @@ f"{'hi':^8}|"        # "   hi   |"    center
 f"{x=}"              # "x=3.14159"    debug form: shows name and value
 ```
 
+## Bytes
+
+Text (`str`) and raw bytes (`bytes`) are different types: a string holds
+characters, bytes hold numbers 0–255. Converting between them always goes
+through an encoding (UTF-8 unless you have a reason otherwise).
+
+```python
+data = b"hello"            # bytes literal: b-prefix, raw bytes, NOT text
+type(data)                 # <class 'bytes'>
+
+# str -> bytes: encode
+b = "città".encode("utf-8")     # b'citt\xc3\xa0'
+len(b)                          # 6 -> "à" takes TWO bytes in UTF-8
+
+# bytes -> str: decode
+b.decode("utf-8")          # "città"
+
+# Indexing bytes yields INTEGERS, not 1-char strings
+b"hi"[0]                   # 104  -> the byte value of "h"
+bytes([104, 105])          # b'hi' -> and back from a list of ints
+
+# str and bytes never mix silently
+# "a" + b"b"               # TypeError: can only concatenate str to str
+```
+
 ## Lists
 
 ```python
