@@ -406,6 +406,32 @@ def add_item(lst):
 data = [1]
 add_item(data)
 data                  # [1, 'x']
+
+# del removes variables, attributes, and collection members alike
+n = 42
+del n                 # unbinds the NAME
+# n                   # NameError: name 'n' is not defined
+
+lst = [1, 2, 3, 4]
+del lst[0]            # remove one element -> [2, 3, 4]
+del lst[1:]           # or a whole slice   -> [2]
+# (dict keys too: del d["a"] — see Dictionaries. But NOT tuples/strings:
+# del t[0] on a tuple  # TypeError — immutables don't support deletion)
+
+class Box:
+    pass
+
+box = Box()
+box.size = 10
+del box.size          # attributes can be deleted as well
+# box.size            # AttributeError: no attribute 'size'
+
+# del deletes the BINDING, not the object: the object only dies when
+# no references to it remain
+a = [1, 2]
+b = a
+del a                 # the list lives on...
+b                     # [1, 2]  -> ...still reachable through b
 ```
 
 ## Conditionals
