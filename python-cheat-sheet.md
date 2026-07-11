@@ -21,6 +21,29 @@ x = x + 5        # now 15
 # ...even to a completely different type (dynamic typing)
 x = "now a string"   # perfectly valid
 x = [1, 2, 3]        # and now it's a list
+
+# type() reveals any value's class. (It's a built-in, not an operator —
+# in fact type is itself a class: type(x) returns the class of x.)
+type(3)              # <class 'int'>
+type(3.14)           # <class 'float'>
+type("x")            # <class 'str'>
+type(True)           # <class 'bool'>
+type(None)           # <class 'NoneType'>
+type([1])            # <class 'list'>
+type((1,))           # <class 'tuple'>   (the comma makes the tuple)
+type({1})            # <class 'set'>     ({} braces with no colon -> set)
+type({"a": 1})       # <class 'dict'>
+type(b"x")           # <class 'bytes'>
+
+# It works on class instances (and on classes) too
+class Dog:
+    pass
+
+rex = Dog()
+type(rex)            # <class '__main__.Dog'>  (qualified by module name)
+type(rex) is Dog     # True
+type(rex).__name__   # "Dog"
+type(Dog)            # <class 'type'>  -> a class is itself an object
 ```
 
 ## Printing
