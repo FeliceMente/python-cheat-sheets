@@ -22,6 +22,12 @@ x = x + 5        # now 15
 x = "now a string"   # perfectly valid
 x = [1, 2, 3]        # and now it's a list
 
+# Python has NO real constants. UPPER_CASE names are a CONVENTION
+# meaning "please don't reassign" — nothing enforces it.
+MAX_RETRIES = 3      # a "constant", by convention only
+MAX_RETRIES = 5      # ...reassignment is perfectly legal
+# (typing.Final adds type-checker enforcement — see the advanced sheet)
+
 # type() reveals any value's class. (It's a built-in, not an operator —
 # in fact type is itself a class: type(x) returns the class of x.)
 type(3)              # <class 'int'>

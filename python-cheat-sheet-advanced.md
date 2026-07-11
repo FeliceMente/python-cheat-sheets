@@ -24,6 +24,14 @@ from typing import Optional, Callable, Any
 val: Optional[int] = None          # same as: int | None
 cb: Callable[[int], str] = str     # a function taking int, returning str
 anything: Any = "escape hatch"     # disables type checking for this name
+
+# Final: declares a constant — enforced by TYPE CHECKERS only; the
+# interpreter never blocks the reassignment (Python has no true const)
+from typing import Final
+MAX_SIZE: Final = 100
+MAX_SIZE = 200                     # runs fine; mypy reports an error
+# For runtime-protected constants use an Enum: members can't be
+# reassigned (Color.RED = 99 -> AttributeError) — see Enums below.
 ```
 
 ## Private Attributes & Name Mangling
