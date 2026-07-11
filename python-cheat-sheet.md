@@ -293,6 +293,18 @@ id(a) == id(b)  # False   equal lists, but two different objects
 # (Caching of small ints/strings can make `is` LOOK like == by accident.)
 x = None
 x is None       # True    the correct way to test for None (not ==)
+
+# WHY not ==? Because == calls __eq__, and a class can override it to
+# answer anything — so `x == None` can lie. Identity can't be fooled,
+# and since None is a SINGLETON (one object ever), `is` asks exactly
+# the right question: "is this that one object?"
+class Weird:
+    def __eq__(self, other):
+        return True          # claims equality with EVERYTHING
+
+w = Weird()
+w == None       # True    -> the lie: __eq__ decided the answer
+w is None       # False   -> the truth: w is not the None object
 ```
 
 ## Mutability & References
