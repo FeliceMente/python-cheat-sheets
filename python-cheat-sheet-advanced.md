@@ -217,6 +217,45 @@ sq.describe()     # "area = 16"
 Often you don't even need this — thanks to duck typing, any object with the
 right methods works. ABCs are for when you want to *enforce* that contract.
 
+## Structural Typing (`Protocol`)
+
+The bridge between duck typing and ABCs: a `Protocol` describes a **shape**,
+and for the type checker any class with matching methods satisfies it — no
+inheritance, nothing declared, and it works retroactively for classes you
+don't own. ABCs are *nominal* (must inherit, enforced at runtime); Protocols
+are *structural* (checker-time only, nothing enforced at runtime).
+
+```python
+from typing import Protocol, runtime_checkable
+
+class Quacker(Protocol):
+    def quack(self) -> str: ...   # the required shape
+
+class Duck:                       # note: does NOT inherit from Quacker
+    def quack(self) -> str:
+        return "quack"
+
+def talk(q: Quacker) -> str:
+    return q.quack()
+
+talk(Duck())      # "quack" -> mypy approves: Duck has the right shape
+# talk(42)        # mypy: incompatible type "int"; expected "Quacker"
+#                 # (and AttributeError at runtime — no quack())
+
+# isinstance against a Protocol needs @runtime_checkable
+# (it checks that the method NAMES exist — not their signatures)
+@runtime_checkable
+class Closeable(Protocol):
+    def close(self) -> None: ...
+
+class File:
+    def close(self) -> None:
+        pass
+
+isinstance(File(), Closeable)     # True  -> has a close() method
+isinstance(42, Closeable)         # False
+```
+
 ## Iterators (Full Protocol)
 
 An **iterator** implements `__iter__` (returns the iterator) and `__next__`
@@ -251,6 +290,55 @@ class Numbers:
 nums = Numbers([1, 2, 3])
 list(nums)        # [1, 2, 3]
 list(nums)        # [1, 2, 3] again -> reusable
+```
+
+## Context Managers (`with`)
+
+`with` works on any object implementing the context manager protocol:
+`__enter__` runs at entry, `__exit__` at exit — **always**, even when the
+block raises (built-in try/finally). `open()` on the basics sheet is one;
+here is how to write your own.
+
+```python
+class Managed:
+    def __enter__(self):
+        print("enter")
+        return self               # the value bound by `as`
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("exit")             # runs even if the block raised
+        return False              # False -> let any exception propagate
+
+with Managed() as m:
+    print("inside")
+# enter / inside / exit
+
+# __exit__ receives the exception (or None, None, None on success);
+# returning True SWALLOWS it
+class Suppress:
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc_value, tb):
+        return exc_type is ValueError     # suppress ValueError only
+
+with Suppress():
+    raise ValueError("handled")
+print("still running")            # the exception never escaped the with
+
+# The generator shortcut: contextlib turns a generator function into a
+# context manager — code before yield = __enter__, after = __exit__
+from contextlib import contextmanager
+
+@contextmanager
+def tag(name):
+    print(f"<{name}>")            # entry
+    try:
+        yield name                # the with-block runs here; `as` gets name
+    finally:
+        print(f"</{name}>")       # exit — finally guards against errors
+
+with tag("b") as t:
+    print("bold text")
+# <b> / bold text / </b>
 ```
 
 ## Dataclasses
