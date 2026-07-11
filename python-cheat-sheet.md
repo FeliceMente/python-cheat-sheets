@@ -1010,6 +1010,15 @@ class Amphibian(Walker, Swimmer):    # inherits from both
 Amphibian().move()    # "walking" -> parents checked left-to-right (MRO)
 Amphibian.__mro__     # the Method Resolution Order Python follows
 
+# There is never an ambiguity error at lookup: the MRO always yields ONE
+# deterministic winner, however many parents define the same name.
+# The only possible failure is at CLASS DEFINITION, if the parent list
+# contradicts itself (a class before its own subclass):
+class Base: pass
+class Sub(Base): pass
+# class Broken(Base, Sub): pass
+#   TypeError: Cannot create a consistent method resolution order (MRO)
+
 # Empty class placeholder (pass = do nothing)
 class Empty:
     pass
