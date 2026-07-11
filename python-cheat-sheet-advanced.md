@@ -101,6 +101,31 @@ existing.species          # "canine" -> the already-created instance sees it
 Dog().species            # "canine" -> and so does a brand-new one
 del Dog.species          # remove it again (gone for all instances)
 
+# Methods are just CALLABLE attributes — one can be added at runtime
+Dog.speak = lambda self: "woof"
+d.speak()             # "woof" -> existing instances get it too
+
+# Functions are objects too, and DO accept arbitrary attributes
+def greet():
+    return "hi"
+
+greet.calls = 0       # e.g. tag metadata onto the function
+greet.__dict__        # {'calls': 0}
+
+# Built-in ("primitive") types are sealed: neither their instances nor
+# the types themselves accept new attributes or methods
+# (5).x = 1           # AttributeError: ...no __dict__ for setting attributes
+# int.x = 1           # TypeError: cannot set 'x' attribute of
+#                     #            immutable type 'int'
+# str.shout = f       # TypeError — no monkey-patching built-ins
+
+# The way to "extend" a built-in is to subclass it
+class MyStr(str):
+    def shout(self):
+        return self.upper() + "!"
+
+MyStr("hi").shout()   # "HI!"
+
 # __slots__ PREVENTS arbitrary attributes (less memory, fixed names)
 class Point:
     __slots__ = ("x", "y")
