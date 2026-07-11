@@ -192,8 +192,17 @@ s[::-1]       # [9, 8, 7, ... 0]   reversed (step of -1)
 # Out-of-range slices are forgiving (unlike indexing): they clamp
 s[2:100]      # [2, 3, 4, 5, 6, 7, 8, 9]   no IndexError, stops at the end
 
-# Slice assignment replaces a range (lists only)
-s[0:2] = [100]    # [100, 2, 3, 4, 5, 6, 7, 8, 9]
+# Slice assignment: a slice CAN sit left of = (lists only — never on
+# immutable str/tuple). It replaces the range, and the new part may be
+# a DIFFERENT length, so the list grows or shrinks to fit.
+s[0:2] = [100]    # [100, 2, 3, 4, 5, 6, 7, 8, 9]  -> 2 replaced by 1
+s[1:1] = [55]     # [100, 55, 2, ...]  empty slice -> pure INSERT at 1
+s[0:2] = []       # [2, 3, ...]        assign []   -> deletes the range
+
+# With a step, lengths must match EXACTLY
+t = [0, 1, 2, 3, 4, 5]
+t[::2] = ["a", "b", "c"]   # ['a', 1, 'b', 3, 'c', 5]
+# t[::2] = ["a"]           # ValueError: size 1 into extended slice of 3
 ```
 
 ## Dictionaries
