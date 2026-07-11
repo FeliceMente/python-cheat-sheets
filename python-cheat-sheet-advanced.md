@@ -120,8 +120,10 @@ def greet():
 greet.calls = 0       # e.g. tag metadata onto the function
 greet.__dict__        # {'calls': 0}
 
-# Built-in ("primitive") types are sealed: neither their instances nor
-# the types themselves accept new attributes or methods
+# Built-in ("primitive") types are sealed, for two separate reasons:
+# their instances carry NO __dict__ (nowhere to store an attribute —
+# also what __slots__ does, below), and the types themselves are
+# immutable, so they can't be monkey-patched either.
 # (5).x = 1           # AttributeError: ...no __dict__ for setting attributes
 # int.x = 1           # TypeError: cannot set 'x' attribute of
 #                     #            immutable type 'int'
