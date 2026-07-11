@@ -240,6 +240,18 @@ for key, val in scores.items():   # idiomatic way to iterate key/value pairs
     print(key, val)
 list(scores.values())       # [1, 2, 3]  -> wrap in list() for a snapshot
 
+# Dicts KEEP INSERTION ORDER (guaranteed by the language since 3.7):
+# keys iterate in the order they were first added, not alphabetically.
+# Updating a value doesn't move a key; delete + re-insert sends it last.
+d = {"b": 1}
+d["a"] = 2
+d["c"] = 3
+list(d)              # ['b', 'a', 'c']  -> insertion order
+d["b"] = 99          # update: position unchanged -> ['b', 'a', 'c']
+del d["b"]
+d["b"] = 1           # re-insert: goes to the end -> ['a', 'c', 'b']
+# (Sets make NO such promise — never rely on their order.)
+
 # Merge into a NEW dict with | (Python 3.9+)
 combined = {"a": 1} | {"b": 2}    # {"a": 1, "b": 2}
 ```
