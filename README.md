@@ -53,3 +53,8 @@ changes:
 ```bash
 uv run --with markdown-pdf --with linkify-it-py python scripts/generate_pdfs.py
 ```
+
+## Contributing
+
+Spotted an error or a missing gotcha? Issues and PRs are welcome — CI runs
+every Python snippet on each push, so fixes are easy to verify.

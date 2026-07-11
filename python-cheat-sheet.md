@@ -955,6 +955,24 @@ bump()
 count                   # 1
 ```
 
+## Common Built-ins
+
+```python
+print("hi")          # output (see the Printing section above)
+# input("Name: ")    # read user input -> ALWAYS returns a str
+# age = int(input("Age: "))   # convert when you need a number
+len([1, 2, 3])       # 3
+range(0, 5)          # 0,1,2,3,4 (lazy sequence)
+sum([1, 2, 3])       # 6
+min([3, 1, 2])       # 1   (max([3, 1, 2]) -> 3)
+abs(-5)              # 5
+round(3.14159, 2)    # 3.14
+sorted([3, 1, 2])    # [1, 2, 3]
+list(zip([1, 2], ["a", "b"]))     # [(1, 'a'), (2, 'b')]
+list(map(str, [1, 2, 3]))         # ['1', '2', '3']  (apply fn to each)
+list(filter(lambda n: n > 1, [1, 2, 3]))  # [2, 3]  (keep where True)
+```
+
 ## Decorators
 
 A decorator is a function that wraps another function to add behavior,
@@ -972,6 +990,26 @@ def greet(name):
     return f"hi {name}"
 
 greet("alice")        # "HI ALICE"  -> wrapped by shout
+
+# GOTCHA: wrapping ERASES the function's identity — greet now reports
+# the wrapper's name and loses its docstring:
+greet.__name__        # "wrapper"  (not "greet"!)
+
+# Fix: decorate the wrapper with functools.wraps, which copies the
+# original's name, docstring, etc. onto it. Use it in every decorator.
+import functools
+
+def shout_well(func):
+    @functools.wraps(func)            # preserves func's identity
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs).upper()
+    return wrapper
+
+@shout_well
+def cheer(name):
+    return f"go {name}"
+
+cheer.__name__        # "cheer"  -> identity survived
 
 # Common built-in decorators you'll see:
 #   @staticmethod / @classmethod  (in classes, shown below)
@@ -1180,24 +1218,6 @@ sorted([b, a])    # sorts to [Money(5), Money(10)] thanks to __lt__
 Other common ones: `__repr__` (debug representation), `__len__` (`len()`),
 `__getitem__` (`obj[key]`), and `__gt__` / `__le__` / `__ge__` for the
 remaining comparisons.
-
-## Common Built-ins
-
-```python
-print("hi")          # output (see Printing section below)
-# input("Name: ")    # read user input -> ALWAYS returns a str
-# age = int(input("Age: "))   # convert when you need a number
-len([1, 2, 3])       # 3
-range(0, 5)          # 0,1,2,3,4 (lazy sequence)
-sum([1, 2, 3])       # 6
-min([3, 1, 2])       # 1   (max([3, 1, 2]) -> 3)
-abs(-5)              # 5
-round(3.14159, 2)    # 3.14
-sorted([3, 1, 2])    # [1, 2, 3]
-list(zip([1, 2], ["a", "b"]))     # [(1, 'a'), (2, 'b')]
-list(map(str, [1, 2, 3]))         # ['1', '2', '3']  (apply fn to each)
-list(filter(lambda n: n > 1, [1, 2, 3]))  # [2, 3]  (keep where True)
-```
 
 ## Error Handling
 
