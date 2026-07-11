@@ -14,6 +14,10 @@ int("10")        # convert to int
 str(10)          # convert to str
 float("2.5")     # convert to float
 
+# int, str, and float are CLASSES, not functions: a "conversion" is
+# really a constructor call — int("10") instantiates a NEW int from
+# the string, exactly like calling one of your own classes.
+
 # Variables can be reassigned freely...
 x = 10           # now 10
 x = x + 5        # now 15
@@ -28,8 +32,9 @@ MAX_RETRIES = 3      # a "constant", by convention only
 MAX_RETRIES = 5      # ...reassignment is perfectly legal
 # (typing.Final adds type-checker enforcement — see the advanced sheet)
 
-# type() reveals any value's class. (It's a built-in, not an operator —
-# in fact type is itself a class: type(x) returns the class of x.)
+# type() reveals any value's class. It's NOT an operator, and not a
+# function either: type is itself a class (like int above) — calling
+# it with one argument returns the class of that argument.
 type(3)              # <class 'int'>
 type(3.14)           # <class 'float'>
 type("x")            # <class 'str'>
@@ -41,6 +46,14 @@ type({1})            # <class 'set'>     ({} braces with no colon -> set)
 type({"a": 1})       # <class 'dict'>
 type(b"x")           # <class 'bytes'>
 
+# Functions are objects too, with a type of their own
+def f():
+    pass
+
+type(f)              # <class 'function'>
+type(lambda x: x)    # <class 'function'>  (a lambda is a plain function)
+type(len)            # <class 'builtin_function_or_method'>
+
 # It works on class instances (and on classes) too
 class Dog:
     pass
@@ -50,6 +63,7 @@ type(rex)            # <class '__main__.Dog'>  (qualified by module name)
 type(rex) is Dog     # True
 type(rex).__name__   # "Dog"
 type(Dog)            # <class 'type'>  -> a class is itself an object
+type(type)           # <class 'type'>  -> ...and type is its OWN type
 ```
 
 ## Printing
