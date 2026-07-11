@@ -424,6 +424,20 @@ match command:
     case _:                       # _ is the default (wildcard)
         print("unknown command")
 
+# Cases are tried TOP TO BOTTOM: the first match wins, runs its body,
+# and the rest are skipped — no fall-through, no break (unlike switch).
+# ORDER MATTERS with overlapping patterns: put narrow cases first.
+match 5:
+    case int():                   # broad case listed first...
+        print("an int")           # -> wins
+    case 5:                       # ...so this never gets a chance
+        print("exactly five")
+
+# If NO case matches (and there is no _), nothing runs — no error.
+match "no case matches me":
+    case 1:
+        print("one")              # skipped; the match just does nothing
+
 # It can also destructure data
 point = (0, 5)
 match point:
