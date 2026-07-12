@@ -586,3 +586,38 @@ logging.basicConfig(
 )
 log.info("timestamped")   # e.g. 2026-07-12 11:19:09 INFO __main__: timestamped
 ```
+
+## Iterator Tools (`itertools`)
+
+Lazy building blocks for loops — like generators (basics sheet), they yield
+one item at a time, so they handle huge or even infinite streams. Everything
+below returns an iterator; wrap in `list()` to see the items.
+
+```python
+from itertools import (chain, count, islice, product,
+                       permutations, combinations, zip_longest, batched)
+
+# chain: several iterables, one seamless loop (nothing is concatenated)
+list(chain([1, 2], (3, 4), "ab"))    # [1, 2, 3, 4, 'a', 'b']
+
+# count: 10, 11, 12, ... forever — islice takes a slice of ANY iterator
+# (generators have no [:5]; islice is how you "slice" them)
+list(islice(count(10), 5))           # [10, 11, 12, 13, 14]
+
+# product: the cartesian product — nested loops in one call
+list(product("AB", "12"))    # [('A','1'), ('A','2'), ('B','1'), ('B','2')]
+
+# permutations: ordered arrangements | combinations: unordered picks
+list(permutations([1, 2, 3], 2))
+# [(1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+list(combinations([1, 2, 3], 2))
+# [(1, 2), (1, 3), (2, 3)]    -> no (2, 1): order doesn't matter here
+
+# zip_longest: like zip, but pads to the LONGEST input
+# (plain zip stops at the shortest — see the basics Loops section)
+list(zip_longest([1, 2, 3], "ab", fillvalue="-"))
+# [(1, 'a'), (2, 'b'), (3, '-')]
+
+# batched (3.12+): fixed-size chunks — the last may be shorter
+list(batched([1, 2, 3, 4, 5], 2))    # [(1, 2), (3, 4), (5,)]
+```
