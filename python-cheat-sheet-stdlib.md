@@ -88,3 +88,28 @@ args.level           # 3  -> already an int, thanks to type=int
 #                             # required: path  -> SystemExit(2)
 # parser.parse_args(["-h"])   # prints full help and exits
 ```
+
+## Environment Variables
+
+```python
+import os
+
+# os.environ is a dict-like view of the process environment
+# os.environ["HOME"]            # e.g. '/Users/alice' — varies per machine
+os.environ.get("API_KEY")       # None -> missing key, no error (like dict.get)
+os.environ.get("API_KEY", "")   # ""   -> or supply your own default
+# os.environ["API_KEY"]         # KeyError if not set ([] access raises)
+
+# Setting: values must be STRINGS; child processes inherit them
+os.environ["APP_MODE"] = "debug"
+os.environ["APP_MODE"]          # 'debug'
+# os.environ["PORT"] = 8000     # TypeError: str expected, not int
+os.environ["PORT"] = "8000"     # numbers go in (and come out) as strings
+int(os.environ["PORT"])         # 8000 -> convert on the way out
+
+del os.environ["APP_MODE"]      # unset
+"APP_MODE" in os.environ        # False
+
+# Changes affect THIS process and its children only — never the shell
+# that launched it; everything reverts when the process exits.
+```
