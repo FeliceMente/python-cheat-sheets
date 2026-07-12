@@ -113,3 +113,48 @@ del os.environ["APP_MODE"]      # unset
 # Changes affect THIS process and its children only — never the shell
 # that launched it; everything reverts when the process exits.
 ```
+
+## JSON
+
+```python
+import json
+
+# Python -> JSON string: dumps ("dump to string"). The typical input is
+# a DICT (any mix of the mapped types below works):
+data = {"name": "Alice", "age": 30, "tags": ["admin"], "active": True}
+json.dumps(data)   # '{"name": "Alice", "age": 30, "tags": ["admin"], "active": true}'
+
+# JSON string -> Python: loads. A JSON object comes back as a real DICT
+# (a top-level JSON array would come back as a list):
+json.loads('{"x": 1, "ok": true, "note": null}')
+# {'x': 1, 'ok': True, 'note': None}   -> a dict; true/null became True/None
+
+# Mapping: dict<->object, list/tuple<->array, str<->string, int/float
+# <->number, True/False<->true/false, None<->null. Sets don't fit:
+# json.dumps({1, 2})   # TypeError: Object of type set is not JSON serializable
+
+# Pretty-print with indent
+print(json.dumps({"a": 1, "b": [2, 3]}, indent=2))
+# {
+#   "a": 1,
+#   "b": [
+#     2,
+#     3
+#   ]
+# }
+
+# Files: dump/load (no s) work on file objects directly
+with open("config.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2)
+
+with open("config.json", encoding="utf-8") as f:
+    loaded = json.load(f)
+loaded == data     # True -> clean round-trip
+
+# Non-ASCII is escaped by default; ensure_ascii=False keeps it readable
+json.dumps({"city": "città"})                      # '{"city": "citt\\u00e0"}'
+json.dumps({"city": "città"}, ensure_ascii=False)  # '{"city": "città"}'
+
+# GOTCHA: JSON object keys are ALWAYS strings — non-string keys convert
+json.loads(json.dumps({1: "one"}))   # {'1': 'one'} -> the int key became '1'
+```
