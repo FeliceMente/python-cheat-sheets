@@ -279,6 +279,65 @@ base64.b64encode(bytes([251, 255]))          # b'+/8='
 base64.urlsafe_b64encode(bytes([251, 255]))  # b'-_8='
 ```
 
+## CSV Files (`csv`)
+
+```python
+import csv
+
+# Always open csv files with newline="". The csv module writes its own
+# row endings: \r\n by default (the RFC 4180 / Excel convention — most
+# parsers happily accept plain \n too, see below). Text mode would
+# translate AGAIN (see File I/O): on Windows every row would become
+# \r\r\n — the classic "blank line after each row in Excel" bug — and
+# reading can corrupt newlines inside quoted fields. newline="" means
+# only the csv module decides line endings, never the file mode.
+rows = [["name", "age"], ["Alice", 30], ["Bob", 25]]
+with open("people.csv", "w", encoding="utf-8", newline="") as f:
+    csv.writer(f).writerows(rows)        # writerow() does a single one
+# people.csv now contains:
+#   name,age
+#   Alice,30
+#   Bob,25
+
+# Reading: EVERY field comes back as a string — convert numbers yourself
+with open("people.csv", encoding="utf-8", newline="") as f:
+    data = list(csv.reader(f))
+data     # [['name', 'age'], ['Alice', '30'], ['Bob', '25']]
+#                                      ^^^^ '30', not 30
+
+# DictReader/DictWriter: rows as dicts, keyed by the header row
+with open("people.csv", encoding="utf-8", newline="") as f:
+    for row in csv.DictReader(f):
+        print(row["name"], row["age"])   # Alice 30 / Bob 25
+
+with open("people.csv", "w", encoding="utf-8", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=["name", "age"])
+    w.writeheader()                      # writes: name,age
+    w.writerow({"name": "Carol", "age": 35})   # writes: Carol,35
+
+# Quoting is automatic when a value contains the delimiter or quotes
+import io
+buf = io.StringIO()                      # an in-memory text file
+csv.writer(buf).writerow(["hi, there", 'say "hi"'])
+buf.getvalue()       # '"hi, there","say ""hi"""\r\n'
+
+# Prefer plain \n row endings (e.g. cleaner git diffs)? Override them —
+# the newline="" advice still applies, so nothing re-translates behind
+# your back:
+buf = io.StringIO()
+csv.writer(buf, lineterminator="\n").writerow(["a", "b"])
+buf.getvalue()       # 'a,b\n'
+
+# Different separator: pass delimiter= to writer AND reader alike
+with open("semi.csv", "w", encoding="utf-8", newline="") as f:
+    csv.writer(f, delimiter=";").writerows([["name", "age"], ["Alice", 30]])
+# semi.csv now contains:
+#   name;age
+#   Alice;30
+with open("semi.csv", encoding="utf-8", newline="") as f:
+    list(csv.reader(f, delimiter=";"))   # [['name', 'age'], ['Alice', '30']]
+```
+
 ## Hashing
 
 A hash is a fixed-length fingerprint of some bytes: one-way (no decoding
@@ -624,63 +683,4 @@ list(zip_longest([1, 2, 3], "ab", fillvalue="-"))
 
 # batched (3.12+): fixed-size chunks — the last may be shorter
 list(batched([1, 2, 3, 4, 5], 2))    # [(1, 2), (3, 4), (5,)]
-```
-
-## CSV Files (`csv`)
-
-```python
-import csv
-
-# Always open csv files with newline="". The csv module writes its own
-# row endings: \r\n by default (the RFC 4180 / Excel convention — most
-# parsers happily accept plain \n too, see below). Text mode would
-# translate AGAIN (see File I/O): on Windows every row would become
-# \r\r\n — the classic "blank line after each row in Excel" bug — and
-# reading can corrupt newlines inside quoted fields. newline="" means
-# only the csv module decides line endings, never the file mode.
-rows = [["name", "age"], ["Alice", 30], ["Bob", 25]]
-with open("people.csv", "w", encoding="utf-8", newline="") as f:
-    csv.writer(f).writerows(rows)        # writerow() does a single one
-# people.csv now contains:
-#   name,age
-#   Alice,30
-#   Bob,25
-
-# Reading: EVERY field comes back as a string — convert numbers yourself
-with open("people.csv", encoding="utf-8", newline="") as f:
-    data = list(csv.reader(f))
-data     # [['name', 'age'], ['Alice', '30'], ['Bob', '25']]
-#                                      ^^^^ '30', not 30
-
-# DictReader/DictWriter: rows as dicts, keyed by the header row
-with open("people.csv", encoding="utf-8", newline="") as f:
-    for row in csv.DictReader(f):
-        print(row["name"], row["age"])   # Alice 30 / Bob 25
-
-with open("people.csv", "w", encoding="utf-8", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=["name", "age"])
-    w.writeheader()                      # writes: name,age
-    w.writerow({"name": "Carol", "age": 35})   # writes: Carol,35
-
-# Quoting is automatic when a value contains the delimiter or quotes
-import io
-buf = io.StringIO()                      # an in-memory text file
-csv.writer(buf).writerow(["hi, there", 'say "hi"'])
-buf.getvalue()       # '"hi, there","say ""hi"""\r\n'
-
-# Prefer plain \n row endings (e.g. cleaner git diffs)? Override them —
-# the newline="" advice still applies, so nothing re-translates behind
-# your back:
-buf = io.StringIO()
-csv.writer(buf, lineterminator="\n").writerow(["a", "b"])
-buf.getvalue()       # 'a,b\n'
-
-# Different separator: pass delimiter= to writer AND reader alike
-with open("semi.csv", "w", encoding="utf-8", newline="") as f:
-    csv.writer(f, delimiter=";").writerows([["name", "age"], ["Alice", 30]])
-# semi.csv now contains:
-#   name;age
-#   Alice;30
-with open("semi.csv", encoding="utf-8", newline="") as f:
-    list(csv.reader(f, delimiter=";"))   # [['name', 'age'], ['Alice', '30']]
 ```
