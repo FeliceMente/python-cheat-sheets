@@ -178,3 +178,27 @@ json.dumps({"city": "città"}, ensure_ascii=False)  # '{"city": "città"}'
 # GOTCHA: JSON object keys are ALWAYS strings — non-string keys convert
 json.loads(json.dumps({1: "one"}))   # {'1': 'one'} -> the int key became '1'
 ```
+
+## Base64
+
+Base64 represents arbitrary **bytes** as plain ASCII text — the standard way
+to move binary data through text-only channels (JSON, URLs, email). It is an
+encoding, **not encryption**: anyone can decode it, so it protects nothing.
+
+```python
+import base64
+
+# bytes in -> bytes out (the bytes type is on the basics sheet)
+raw = b"hi there"
+encoded = base64.b64encode(raw)   # b'aGkgdGhlcmU='
+base64.b64decode(encoded)         # b'hi there'  -> clean round-trip
+
+# Strings need the str<->bytes hop on BOTH ends
+b64 = base64.b64encode("città".encode("utf-8")).decode("ascii")
+b64                                       # 'Y2l0dMOg' -> a plain str now
+base64.b64decode(b64).decode("utf-8")     # 'città'
+
+# URL-safe variant: substitutes -_ for +/ (safe in URLs and filenames)
+base64.b64encode(bytes([251, 255]))          # b'+/8='
+base64.urlsafe_b64encode(bytes([251, 255]))  # b'-_8='
+```
