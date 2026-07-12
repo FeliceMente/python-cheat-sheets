@@ -28,6 +28,7 @@ DEFAULT_FILES = [
     "python-cheat-sheet-getting-started.md",
     "python-cheat-sheet.md",
     "python-cheat-sheet-advanced.md",
+    "python-cheat-sheet-stdlib.md",
 ]
 
 BLOCK_RE = re.compile(r"```python\n(.*?)```", re.DOTALL)

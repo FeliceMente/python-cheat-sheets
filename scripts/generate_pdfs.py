@@ -34,6 +34,7 @@ SHEETS = [
     "python-cheat-sheet-getting-started.md",
     "python-cheat-sheet.md",
     "python-cheat-sheet-advanced.md",
+    "python-cheat-sheet-stdlib.md",
     "uv-cheat-sheet.md",
 ]
 
