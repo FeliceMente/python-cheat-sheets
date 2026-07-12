@@ -358,3 +358,63 @@ cards                    # [4, 2, 3, 5, 1] -> same list, new order
 random.sample(cards, len(cards))   # [4, 1, 5, 3, 2] -> new list
 cards                              # [4, 2, 3, 5, 1] -> original untouched
 ```
+
+## Specialized Containers (`collections`)
+
+Four upgrades over the built-in collections, each solving one recurring
+chore.
+
+```python
+from collections import Counter, defaultdict, namedtuple, deque
+
+# Counter: tallies anything iterable — the "counting dict"
+votes = Counter(["yes", "no", "yes", "yes", "abstain"])
+votes                    # Counter({'yes': 3, 'no': 1, 'abstain': 1})
+votes["yes"]             # 3
+votes["missing"]         # 0 -> missing counts are 0, never a KeyError
+votes.most_common(2)     # [('yes', 3), ('no', 1)] -> top-k, ready sorted
+Counter("mississippi").most_common(2)   # [('i', 4), ('s', 4)]
+
+# Counters are mutable: increment freely (missing keys start at 0),
+# feed in more items with update(), even add two Counters together
+votes["late"] += 1       # works although "late" wasn't there
+votes.update(["no", "no"])
+votes                    # Counter({'yes': 3, 'no': 3, 'abstain': 1, 'late': 1})
+Counter("aab") + Counter("abb")   # Counter({'a': 3, 'b': 3})
+
+# defaultdict: a dict that CREATES the value on first access, using the
+# factory you give it — kills the "if key not in d: d[key] = []" dance
+groups = defaultdict(list)          # factory list -> default is a new []
+groups["fruit"].append("apple")     # no KeyError: [] appeared, then append
+groups["fruit"].append("pear")
+dict(groups)             # {'fruit': ['apple', 'pear']}
+
+# namedtuple: a tuple with NAMED fields — a lightweight, immutable record
+Point = namedtuple("Point", ["x", "y"])
+p = Point(3, 4)
+p                        # Point(x=3, y=4) -> readable repr for free
+p.x                      # 3 -> access by name...
+p[0]                     # 3 -> ...but it's still a tuple (unpacking works)
+# (need mutability, defaults, methods? -> dataclasses, advanced sheet)
+
+# deque ("deck"): double-ended queue — fast appends/pops at BOTH ends,
+# where lists are slow on the left
+dq = deque([2, 3])
+dq.appendleft(1)         # deque([1, 2, 3])
+dq.append(4)             # deque([1, 2, 3, 4])
+dq.popleft()             # 1 -> O(1); list.pop(0) shifts everything
+dq                       # deque([2, 3, 4])
+deque([1, 2, 3, 4], maxlen=3)   # deque([2, 3, 4], maxlen=3)
+#                        -> bounded: keeps only the LAST 3 (rolling window)
+
+# Stack and queue? No dedicated container needed:
+stack = [1, 2]           # a STACK (LIFO) is just a list...
+stack.append(3)          # push
+stack.pop()              # 3 -> pop; both O(1) at the right end
+q = deque([1, 2])        # a QUEUE (FIFO) is a deque...
+q.append(3)              # enqueue at the right
+q.popleft()              # 1 -> dequeue at the left (never list.pop(0)!)
+# queue.Queue/LifoQueue exist too, but they're THREAD-SAFE pipes for
+# producer/consumer concurrency, not everyday containers. Priority
+# queues: heapq.
+```
