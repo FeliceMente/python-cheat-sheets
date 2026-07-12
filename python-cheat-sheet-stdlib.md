@@ -249,6 +249,10 @@ json.dumps({"city": "città"}, ensure_ascii=False)  # '{"city": "città"}'
 
 # GOTCHA: JSON object keys are ALWAYS strings — non-string keys convert
 json.loads(json.dumps({1: "one"}))   # {'1': 'one'} -> the int key became '1'
+
+# Other config formats: YAML is NOT in the stdlib (needs the
+# third-party PyYAML); TOML is — tomllib (3.11+, parse-only), the
+# format of pyproject.toml. INI files: configparser.
 ```
 
 ## Base64
