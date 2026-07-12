@@ -769,7 +769,8 @@ next(it)             # 10
 next(it)             # 20
 # next() past the end raises StopIteration
 
-# The manual (class) way to build an iterator — what generators save you from:
+# The manual (class) way to build an iterator — what generators save you
+# from (the full iterator protocol is covered on the advanced sheet):
 class Counter:
     def __init__(self, limit):
         self.n, self.limit = 0, limit
@@ -1087,7 +1088,8 @@ cheer.__name__        # "cheer"  -> identity survived
 
 # Common built-in decorators you'll see:
 #   @staticmethod / @classmethod  (in classes, shown below)
-#   @property                     (expose a method like an attribute)
+#   @property                     (expose a method like an attribute;
+#                                  full treatment on the advanced sheet)
 #   @functools.cache              (cache a function's results)
 ```
 
@@ -1248,6 +1250,8 @@ make_it_quack(Duck())     # "Quack!"
 make_it_quack(Person())   # "I'm imitating a duck!"
 # Works for ANY object that has a .quack() method,
 # regardless of its class. Missing it -> AttributeError.
+# To ENFORCE the contract, or have a type checker verify it, see the
+# advanced sheet: Abstract Base Classes and Structural Typing (Protocol).
 ```
 
 You already rely on this everywhere: `len(x)` works on any object with a
@@ -1258,6 +1262,8 @@ not type.
 
 "Dunder" (double-underscore) methods let your objects work with built-in
 operations like `str()`, `int()`, `==`, and `<`. Python calls them for you.
+(The `__repr__` vs `__str__` subtleties get their own section on the
+advanced sheet.)
 
 ```python
 class Money:
@@ -1343,7 +1349,8 @@ except InsufficientFundsError as e:
 `with` opens the file as a *context manager*: it automatically closes the
 file when the block ends — even if an error occurs inside it. This is the
 recommended way, because forgetting to close a file can lose data or leak
-resources.
+resources. (Writing your own context managers is on the advanced sheet, as
+is `pathlib` — the object-oriented way to handle file *paths*.)
 
 ```python
 # Write (creates / overwrites the file)
