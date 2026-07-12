@@ -85,6 +85,18 @@ print("a", "b", "c", sep="-")    # a-b-c
 # end: change what's printed at the end (default is a newline)
 print("no newline", end=" ")
 print("same line")          # no newline same line
+
+# sep and end (and file, flush) are KEYWORD-ONLY: pass them by name,
+# after all the values — their order among themselves doesn't matter
+print("a", "b", sep="-", end="!\n")   # a-b!
+print("a", "b", end="!\n", sep="-")   # a-b!  same thing
+# Without the name it's just another value to print, not a separator:
+print("a", "-")             # a -   -> "-" was printed, not used as sep
+
+# Why: print is declared as
+#   print(*args, sep=' ', end='\n', file=None, flush=False)
+# *args swallows every positional value; all the rest, coming after
+# *args, is keyword-only (see Functions). file=None means sys.stdout.
 ```
 
 ## Strings
@@ -906,16 +918,47 @@ total(*nums)         # 6   -> same as total(1, 2, 3)
 data = {"name": "Bob", "age": 25}
 show(**data)         # {'name': 'Bob', 'age': 25}
 
-# All four kinds together — ORDER MATTERS, must be:
-#   1. regular (required)   2. default   3. *args   4. **kwargs
-def f(a, b=2, *args, **kwargs):
-    print(a, b, args, kwargs)
+# All the kinds together — ORDER MATTERS, must be:
+#   1. positional-only (before /)   2. regular   3. default
+#   4. *args or a bare *   5. keyword-only (may have defaults)   6. **kwargs
+def f(a, b=2, *args, c, d=4, **kwargs):
+    print(a, b, args, c, d, kwargs)
 
-f(1)                       # 1 2 () {}
-f(1, 9)                    # 1 9 () {}
-f(1, 9, 10, 11, x=5)       # 1 9 (10, 11) {'x': 5}
-# def f(*args, a): ...     # a after *args = keyword-ONLY argument
+f(1, c=5)                  # 1 2 () 5 4 {}
+f(1, 9, 10, 11, c=5, x=7)  # 1 9 (10, 11) 5 4 {'x': 7}
+# f(1, 2, 3)               # TypeError: missing required keyword-only 'c'
 # def f(a, b=2, c): ...    # SyntaxError: non-default after default
+
+# This is exactly print's shape: print(*args, sep=' ', end='\n', ...)
+# -> *args, then keyword-only parameters with defaults.
+
+# / and * in a def are MARKERS, not parameters: they receive no value,
+# they only split the parameter list into three zones —
+#
+#   def demo(a, /, b, *, c)
+#            ^^^ before /   POSITIONAL-ONLY: the caller cannot use the
+#                           name (demo(a=1) is an error)
+#                   ^^^     between / and *: NORMAL — positional or
+#                           keyword, the caller chooses
+#                        ^^ after *: KEYWORD-ONLY — the name is required
+#
+# (*args also opens the keyword-only zone, as in f above; a bare *
+# does the same job when you DON'T want to accept extra positionals.)
+def demo(a, /, b, *, c):
+    print(a, b, c)
+
+demo(1, 2, c=3)      # 1 2 3
+demo(1, b=2, c=3)    # 1 2 3   b sits in the middle zone: name optional
+# demo(a=1, b=2, c=3)  # TypeError: positional-only 'a' passed as keyword
+# demo(1, 2, 3)        # TypeError: takes 2 positional arguments, 3 given
+
+# Why bother? / frees the library to RENAME its parameters without
+# breaking callers (you'll see it in help() of built-ins, e.g. len(obj, /));
+# * forces readable call sites for flags and options — print() uses it.
+
+# Inside the keyword-only zone, defaults may come in ANY order:
+# the "non-default after default" rule only binds positional parameters
+# def f(*, c=1, d): ...   # legal — d is passed by name anyway
 ```
 
 ### Returning Multiple Values
