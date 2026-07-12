@@ -58,3 +58,33 @@ len(data)            # 3
 # Modes cheat: r read | w write (truncate!) | a append | x create, fail
 # if it exists | +b modifiers combine: "rb", "a+", "xb"...
 ```
+
+## Command-Line Arguments
+
+```python
+import sys
+
+# sys.argv holds the arguments as a list of STRINGS; [0] is the script.
+# Running:  python myscript.py input.txt --fast
+# gives:    sys.argv == ['myscript.py', 'input.txt', '--fast']
+
+# argparse: declare the arguments, get parsing, validation, and --help
+import argparse
+
+parser = argparse.ArgumentParser(description="Process a file")
+parser.add_argument("path")                          # required positional
+parser.add_argument("--fast", action="store_true")   # boolean flag
+parser.add_argument("--level", type=int, default=1)  # typed, with default
+
+# In a real script:  args = parser.parse_args()   (reads sys.argv)
+# An explicit list also works — used here to keep the example runnable:
+args = parser.parse_args(["input.txt", "--fast", "--level", "3"])
+args.path            # 'input.txt'
+args.fast            # True
+args.level           # 3  -> already an int, thanks to type=int
+
+# Bad input never reaches your code: argparse prints usage and exits
+# parser.parse_args([])       # error: the following arguments are
+#                             # required: path  -> SystemExit(2)
+# parser.parse_args(["-h"])   # prints full help and exits
+```
