@@ -418,3 +418,42 @@ q.popleft()              # 1 -> dequeue at the left (never list.pop(0)!)
 # producer/consumer concurrency, not everyday containers. Priority
 # queues: heapq.
 ```
+
+## Running External Commands (`subprocess`)
+
+```python
+import subprocess
+import sys
+
+# run() starts a program and waits for it. Pass the command as a LIST:
+# no shell parsing, no quoting headaches, no injection risk.
+# sys.executable is a string: the absolute path of the interpreter
+# currently running (e.g. '/usr/local/bin/python3.14'). Launching it
+# as the child means "this exact same Python" — version and venv
+# included — so these examples run anywhere. The pattern is the same
+# for any program: ["git", "status"], ["ls", "-la"], ...
+result = subprocess.run(
+    [sys.executable, "-c", "print('hi from a child process')"],
+    capture_output=True,    # collect stdout/stderr instead of inheriting
+    text=True,              # decode bytes -> str
+)
+result.returncode        # 0 -> the process's exit code; 0 means success
+result.stdout            # 'hi from a child process\n'
+result.stderr            # ''
+
+# A failing command does NOT raise by default — inspect returncode...
+bad = subprocess.run([sys.executable, "-c", "raise SystemExit(3)"])
+bad.returncode           # 3
+# ...or pass check=True to turn failures into exceptions:
+# subprocess.run([...], check=True)
+#   -> CalledProcessError: Command '[...]' returned non-zero exit status 3.
+
+# The command must be a REAL executable on PATH, and availability
+# varies by OS: dir is a binary on Linux, missing on macOS (use ls),
+# and a cmd.exe BUILT-IN on Windows — built-ins need their shell:
+# subprocess.run(["dir"])             # macOS: FileNotFoundError
+# subprocess.run(["cmd", "/c", "dir"])  # Windows: the way to a built-in
+
+# Avoid shell=True (one big string parsed by the shell): it reintroduces
+# exactly the quoting and injection problems the list form avoids.
+```
