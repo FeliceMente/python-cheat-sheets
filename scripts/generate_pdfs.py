@@ -21,6 +21,7 @@ the PDF is rebuilt until no orphans remain.
 
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 import pymupdf
@@ -108,8 +109,10 @@ def _split_before(md_text: str, titles: set) -> list:
 
 
 def _add_footers(pdf_file: Path) -> None:
-    """Stamp the repo URL (clickable, bottom-left) and a page/total count
-    (bottom-right) into the margin of every page."""
+    """Stamp the repo URL (clickable, bottom-left), the generation date
+    (bottom-center), and a page/total count (bottom-right) into the
+    margin of every page."""
+    generated = date.today().isoformat()
     with pymupdf.open(pdf_file) as doc:
         total = doc.page_count
         for page in doc:
@@ -121,6 +124,11 @@ def _add_footers(pdf_file: Path) -> None:
             page.insert_link({"kind": pymupdf.LINK_URI, "uri": REPO_URL,
                               "from": pymupdf.Rect(36, y - FOOTER_SIZE,
                                                    36 + url_w, y + 2)})
+            date_w = pymupdf.get_text_length(generated, fontname=FOOTER_FONT,
+                                             fontsize=FOOTER_SIZE)
+            page.insert_text(((page.rect.width - date_w) / 2, y), generated,
+                             fontname=FOOTER_FONT, fontsize=FOOTER_SIZE,
+                             color=FOOTER_GRAY)
             label = f"{page.number + 1}/{total}"
             label_w = pymupdf.get_text_length(label, fontname=FOOTER_FONT,
                                               fontsize=FOOTER_SIZE)
