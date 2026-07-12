@@ -202,3 +202,46 @@ base64.b64decode(b64).decode("utf-8")     # 'città'
 base64.b64encode(bytes([251, 255]))          # b'+/8='
 base64.urlsafe_b64encode(bytes([251, 255]))  # b'-_8='
 ```
+
+## Hashing
+
+A hash is a fixed-length fingerprint of some bytes: one-way (no decoding
+back), deterministic, and any tiny change produces a completely different
+digest. Uses: integrity checks, deduplication, cache keys.
+
+```python
+import hashlib
+
+# The raw result is BYTES (32 for sha256): digest(). hexdigest() is the
+# SAME value as hex text — 2 chars per byte, 64 total — which is what
+# you print, store, and compare. hexdigest() == digest().hex()
+hashlib.sha256(b"hi there").digest()[:4]   # b'\x9b\x96\xa1\xfe' (raw)
+h = hashlib.sha256(b"hi there").hexdigest()
+h            # '9b96a1fe1d548cbbc960cc6a0286668fd74a763667b06366fb2324269fcabaa4'
+len(h)       # 64 -> always, regardless of the input's size
+# (Below, [:16] only shortens output for THIS sheet — no other meaning.)
+
+# The avalanche effect: one changed byte, entirely different digest
+hashlib.sha256(b"hi therE").hexdigest()[:16]   # '6b2bf6242cbce8a0'
+
+# Other algorithms, same interface. md5/sha1 are BROKEN for security —
+# still fine for checksums and dedup, never for anything an attacker
+# could exploit. Prefer sha256.
+hashlib.md5(b"hi there").hexdigest()    # 'fd33e2e8ad3cb1bdd3ea8f5633fcf5c7'
+
+# Feed data in chunks with update() — e.g. hashing a big file
+inc = hashlib.sha256()
+inc.update(b"hi ")
+inc.update(b"there")
+inc.hexdigest() == h    # True -> same as hashing it in one go
+
+# PASSWORDS are a special case: plain sha256 is too fast to be safe.
+# Use a slow, salted derivation like pbkdf2 (or scrypt):
+dk = hashlib.pbkdf2_hmac("sha256", b"password", b"salt", 100_000)
+dk.hex()[:16]           # '0394a2ede332c9a1'
+
+# secrets: cryptographically strong random tokens (never use random!)
+import secrets
+secrets.token_hex(8)        # e.g. '162bae35215e0d6e' — new every call
+secrets.token_urlsafe(8)    # e.g. 'O2k0llgqkIs'
+```
