@@ -319,3 +319,42 @@ word.search(text).group()    # 'Alice'
 #   +  one or more   * zero or more   ? optional   {n} exactly n
 #   ^  start   $ end   [abc] char set   (a|b) alternation
 ```
+
+## Random Numbers (`random`)
+
+Pseudo-random numbers for simulations, games, sampling. **Not for security**
+— tokens and passwords need `secrets` (see Hashing above).
+
+```python
+import random
+
+# In normal use, do NOT call seed(): Python seeds itself from OS
+# entropy on first use, so every run gets a fresh, unpredictable
+# sequence. Fix the seed ONLY when you WANT repeatability — tests,
+# experiments, demos: same seed -> same numbers, forever (it is how
+# the outputs below can be exact). A fixed seed is predictable by
+# design; seed() with no argument re-seeds unpredictably from the OS.
+random.seed(42)
+
+random.random()          # 0.6394267984578837 -> float in [0.0, 1.0)
+random.randint(1, 6)     # 1                  -> int, BOTH ends included
+random.choice(["rock", "paper", "scissors"])  # 'scissors' -> one element
+
+# sample(population, k): k DISTINCT picks, no repeats — a lottery draw.
+# The population can be any sequence; range(1, 50) is the ints 1..49
+random.sample(range(1, 50), 3)   # [18, 16, 15]
+
+# uniform(a, b): one float anywhere between a and b (ends included) —
+# the pick-from-a-range version of random(), which is locked to [0, 1)
+random.uniform(1, 10)    # 2.255841356726295
+
+# shuffle() reorders a list IN PLACE (mutates it) and returns None,
+# so never write cards = random.shuffle(cards) — cards would be None!
+cards = [1, 2, 3, 4, 5]
+random.shuffle(cards)
+cards                    # [4, 2, 3, 5, 1] -> same list, new order
+
+# Want a shuffled COPY instead? Sample the whole list:
+random.sample(cards, len(cards))   # [4, 1, 5, 3, 2] -> new list
+cards                              # [4, 2, 3, 5, 1] -> original untouched
+```
