@@ -283,3 +283,39 @@ from datetime import timezone
 utc_now = datetime.now(timezone.utc)    # tzinfo=UTC -> comparable across
                                         # zones; prefer aware in real apps
 ```
+
+## Regular Expressions (`re`)
+
+```python
+import re
+
+text = "Order 66 shipped on 2026-07-12 to Alice"
+
+# Write patterns as RAW strings (r"...") so \d survives untouched
+re.search(r"\d+", text)     # <re.Match object; span=(6, 8), match='66'>
+re.search(r"\d+", text).group()   # '66' -> first match, anywhere
+re.match(r"\d+", text)      # None -> match() anchors at the START only
+re.search(r"xyz", text)     # None -> no match is None: always check!
+
+re.findall(r"\d+", text)    # ['66', '2026', '07', '12']  -> all matches
+re.sub(r"\d", "#", text)    # 'Order ## shipped on ####-##-## to Alice'
+
+# Groups: parentheses capture parts of the match
+m = re.search(r"(\d{4})-(\d{2})-(\d{2})", text)
+m.group(0)           # '2026-07-12' -> the whole match
+m.group(1)           # '2026'      -> first captured group
+m.groups()           # ('2026', '07', '12')
+
+# Named groups read better
+m = re.search(r"(?P<year>\d{4})-(?P<month>\d{2})", text)
+m.group("year")      # '2026'
+
+# compile() the pattern once when reusing it; flags tweak the rules
+word = re.compile(r"alice", re.IGNORECASE)
+word.search(text).group()    # 'Alice'
+
+# Mini pattern reference:
+#   \d digit   \w word char   \s whitespace   .  any char
+#   +  one or more   * zero or more   ? optional   {n} exactly n
+#   ^  start   $ end   [abc] char set   (a|b) alternation
+```
