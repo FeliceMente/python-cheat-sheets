@@ -1284,6 +1284,10 @@ class Money:
     def __lt__(self, other):     # used by <  (and enables sorting)
         return self.amount < other.amount
 
+    # --- arithmetic ---
+    def __add__(self, other):    # used by +
+        return Money(self.amount + other.amount)
+
 a = Money(5)
 b = Money(10)
 
@@ -1293,6 +1297,13 @@ bool(Money(0))    # False
 a == Money(5)     # True
 a < b             # True
 sorted([b, a])    # sorts to [Money(5), Money(10)] thanks to __lt__
+(a + b).amount    # 15 -> + built Money(15) via __add__
+
+# This is OPERATOR OVERLOADING: every operator has a dunder hook
+# (+ __add__, - __sub__, * __mul__, / __truediv__ — pathlib uses that
+# one to join paths). The limits: you can't invent NEW operator
+# symbols or change precedence, and the operators of BUILT-IN types
+# are sealed (int.__add__ = ...  # TypeError: immutable type).
 ```
 
 Other common ones: `__repr__` (debug representation), `__len__` (`len()`),
