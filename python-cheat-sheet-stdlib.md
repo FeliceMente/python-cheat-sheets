@@ -58,6 +58,26 @@ len(data)            # 3
 
 # Modes cheat: r read | w write (truncate!) | a append | x create, fail
 # if it exists | +b modifiers combine: "rb", "a+", "xb"...
+
+# Newlines: TEXT mode translates them, BINARY mode never touches them.
+# Reading text converts \r\n (Windows) and \r to \n on ANY OS; writing
+# text converts \n to the platform's ending (\r\n on Windows only).
+with open("crlf.txt", "wb") as f:
+    f.write(b"one\r\ntwo\n")          # raw bytes with a Windows line
+
+with open("crlf.txt", encoding="utf-8") as f:
+    f.read()          # 'one\ntwo\n'      -> \r\n silently became \n
+
+with open("crlf.txt", "rb") as f:
+    f.read()          # b'one\r\ntwo\n'   -> binary: untouched
+
+# newline="" switches the translation OFF in text mode (csv needs this)
+with open("crlf.txt", encoding="utf-8", newline="") as f:
+    f.read()          # 'one\r\ntwo\n'
+
+# The platform's own ending lives in os.linesep: '\n' here, '\r\n' on
+# Windows — but code rarely needs it: just write '\n' and let text
+# mode translate.
 ```
 
 ## Command-Line Arguments
