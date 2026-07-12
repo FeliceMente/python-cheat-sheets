@@ -529,3 +529,60 @@ bad.returncode           # 3
 # Avoid shell=True (one big string parsed by the shell): it reintroduces
 # exactly the quoting and injection problems the list form avoids.
 ```
+
+## Logging
+
+`print` is for program *output*; `logging` is for *diagnostics* — messages
+with severity levels that can be filtered, timestamped, and redirected
+without touching the calling code.
+
+```python
+import logging
+
+# Five levels: DEBUG < INFO < WARNING < ERROR < CRITICAL.
+# With NO configuration at all: only WARNING and above are shown (the
+# classic surprise is logging.info() being silently dropped), in the
+# default format "LEVEL:name:message" with name "root":
+# logging.warning("disk almost full")   # WARNING:root:disk almost full
+
+# Configure ONCE, at program start (only the first call takes effect;
+# force=True replaces an existing configuration)
+logging.basicConfig(level=logging.INFO,
+                    format="%(levelname)s %(name)s: %(message)s",
+                    force=True)
+
+log = logging.getLogger(__name__)   # idiom: one logger per module
+
+log.info("starting up")             # INFO __main__: starting up
+log.warning("disk almost full")     # WARNING __main__: disk almost full
+log.debug("not shown")              # DEBUG < INFO -> dropped
+log.error("write failed")           # ERROR __main__: write failed
+
+# Messages go to STDERR by default (stdout stays clean for output);
+# add filename="app.log" in basicConfig to log to a file instead.
+
+# Pass values as ARGUMENTS, not in an f-string: the message is only
+# formatted if it will actually be emitted (cheap when filtered out)
+user = "alice"
+log.info("user %s logged in", user)   # INFO __main__: user alice logged in
+
+# Inside an except block, exception() = error() + the full traceback
+try:
+    1 / 0
+except ZeroDivisionError:
+    log.exception("division blew up")
+# ERROR __main__: division blew up
+# Traceback (most recent call last): ... ZeroDivisionError: division by zero
+
+# The format string is built from %(...)s placeholders — common ones:
+#   %(asctime)s    timestamp          %(levelname)s   level
+#   %(name)s       logger name        %(message)s     the message
+#   %(filename)s   source file        %(lineno)d      line number
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",   # strftime codes (see datetime above)
+    force=True,
+)
+log.info("timestamped")   # e.g. 2026-07-12 11:19:09 INFO __main__: timestamped
+```
