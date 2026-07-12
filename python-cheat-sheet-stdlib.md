@@ -80,6 +80,58 @@ with open("crlf.txt", encoding="utf-8", newline="") as f:
 # mode translate.
 ```
 
+## Files, Directories & Paths
+
+Everyday filesystem operations with `pathlib.Path`, `shutil`, and
+`tempfile`. (The `Path` object itself — construction, parts, joining with
+`/`, glob patterns — is covered on the advanced sheet.)
+
+```python
+from pathlib import Path
+import shutil
+
+# Create directories
+d = Path("data")
+d.mkdir(exist_ok=True)             # no error if it already exists
+(d / "sub").mkdir(parents=True, exist_ok=True)   # create nested dirs
+
+# Quick one-shot file read/write (opens and closes for you).
+# `/` on a Path JOINS segments: Path("data") / "notes.txt" is the path
+# data/notes.txt — pure construction, nothing touches the disk yet.
+# It's platform-independent: always WRITE /, and Path produces the
+# OS's real separator underneath (backslash on Windows).
+f = d / "notes.txt"
+f.write_text("hello", encoding="utf-8")
+f.read_text(encoding="utf-8")      # 'hello'
+
+# Inspect
+f.exists()                         # True
+f.is_file(), d.is_dir()            # (True, True)
+f.stat().st_size                   # 5 -> size in bytes
+
+# List and search
+sorted(x.name for x in d.iterdir())    # ['notes.txt', 'sub']
+[x.name for x in d.glob("*.txt")]      # ['notes.txt']
+
+# Copy, move/rename, delete
+shutil.copy(f, d / "copy.txt")               # copy a file
+(d / "copy.txt").rename(d / "renamed.txt")   # move / rename
+(d / "renamed.txt").unlink()                 # delete a file
+(d / "sub").rmdir()                # delete an EMPTY directory only
+shutil.rmtree(d)                   # delete a whole tree — no recycle bin!
+d.exists()                         # False
+
+# Temp files/dirs that clean up after themselves
+import tempfile
+with tempfile.TemporaryDirectory() as tmp:
+    Path(tmp, "scratch.txt").write_text("temp")
+# leaving the with-block deleted tmp and everything in it
+
+# Landmarks
+cwd = Path.cwd()     # the process's current working directory
+home = Path.home()   # the user's home directory
+```
+
 ## Command-Line Arguments
 
 ```python
