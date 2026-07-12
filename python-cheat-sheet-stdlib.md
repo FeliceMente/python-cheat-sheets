@@ -47,6 +47,7 @@ with open("notes.txt", encoding="utf-8") as f:
         print(line.rstrip())     # first line / second line
 
 # Binary files: add "b" to the mode -> bytes in, bytes out, no encoding
+# (the bytes type itself is covered on the basics sheet)
 with open("blob.bin", "wb") as f:
     f.write(b"\x00\x01\xff")
 
@@ -129,9 +130,28 @@ json.dumps(data)   # '{"name": "Alice", "age": 30, "tags": ["admin"], "active": 
 json.loads('{"x": 1, "ok": true, "note": null}')
 # {'x': 1, 'ok': True, 'note': None}   -> a dict; true/null became True/None
 
+# Any mapped type works at the TOP level too — e.g. a list
+json.dumps([1, "two", True])   # '[1, "two", true]'
+json.loads("[1, 2, 3]")        # [1, 2, 3]
+
 # Mapping: dict<->object, list/tuple<->array, str<->string, int/float
 # <->number, True/False<->true/false, None<->null. Sets don't fit:
 # json.dumps({1, 2})   # TypeError: Object of type set is not JSON serializable
+
+# Class instances don't serialize by themselves either...
+class User:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+u = User("Alice", 30)
+# json.dumps(u)              # TypeError: Object of type User is not
+#                            #            JSON serializable
+# ...but their attribute dict does — vars(u) is u.__dict__ (see the
+# advanced sheet's Introspection section):
+json.dumps(vars(u))          # '{"name": "Alice", "age": 30}'
+json.dumps(u, default=vars)  # same result — and default= also covers
+                             # objects NESTED anywhere in the data
 
 # Pretty-print with indent
 print(json.dumps({"a": 1, "b": [2, 3]}, indent=2))
