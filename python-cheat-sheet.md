@@ -170,6 +170,7 @@ bytes([104, 105])          # b'hi' -> and back from a list of ints
 
 ```python
 nums = [1, 2, 3]
+empty = []           # an empty list (or: list())
 
 nums.append(4)       # [1, 2, 3, 4]
 nums.insert(0, 0)    # [0, 1, 2, 3, 4]
@@ -229,6 +230,7 @@ t[::2] = ["a", "b", "c"]   # ['a', 1, 'b', 3, 'c', 5]
 
 ```python
 person = {"name": "Alice", "age": 30}
+empty = {}                  # an empty dict — {} is ALWAYS a dict, never a set
 
 person["name"]              # "Alice"
 # person["email"]          # KeyError: a missing key raises on [] access
@@ -287,7 +289,13 @@ point[0]              # 3    -> index like a list
 # Tuples mix types too — the classic use: a fixed-shape record
 user = ("Alice", 30, True)    # name, age, active
 
+# Empty and one-element tuples
+empty = ()            # an empty tuple
+single = (1,)         # ONE element: the trailing comma is required
+type((1))             # <class 'int'> -> (1) is just a grouped 1, NO tuple!
+
 s = {1, 2, 2, 3}      # set -> {1, 2, 3} (unique)
+no_items = set()      # an EMPTY set must use set() — {} is a dict
 s.add(4)
 s.union({5, 6})
 s.intersection({2, 3})
