@@ -232,6 +232,11 @@ t[::2] = ["a", "b", "c"]   # ['a', 1, 'b', 3, 'c', 5]
 person = {"name": "Alice", "age": 30}
 empty = {}                  # an empty dict — {} is ALWAYS a dict, never a set
 
+# The dict() constructor: empty, from keywords, or from key/value pairs
+dict()                      # {}
+dict(name="Alice", age=30)  # {'name': 'Alice', 'age': 30}
+dict([("a", 1), ("b", 2)])  # {'a': 1, 'b': 2}
+
 person["name"]              # "Alice"
 # person["email"]          # KeyError: a missing key raises on [] access
 person.get("email")         # None    -> no error; None when key is missing
@@ -290,9 +295,13 @@ point[0]              # 3    -> index like a list
 user = ("Alice", 30, True)    # name, age, active
 
 # Empty and one-element tuples
-empty = ()            # an empty tuple
+empty = ()            # an empty tuple (or: tuple())
 single = (1,)         # ONE element: the trailing comma is required
 type((1))             # <class 'int'> -> (1) is just a grouped 1, NO tuple!
+
+# The tuple() constructor builds one from any iterable
+tuple([1, 2, 3])      # (1, 2, 3)
+tuple("hi")           # ('h', 'i')
 
 s = {1, 2, 2, 3}      # set -> {1, 2, 3} (unique)
 no_items = set()      # an EMPTY set must use set() — {} is a dict
