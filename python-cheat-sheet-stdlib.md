@@ -245,3 +245,41 @@ import secrets
 secrets.token_hex(8)        # e.g. '162bae35215e0d6e' — new every call
 secrets.token_urlsafe(8)    # e.g. 'O2k0llgqkIs'
 ```
+
+## Dates & Times (`datetime`)
+
+```python
+from datetime import date, datetime, timedelta
+
+# The current moment — values obviously change every run:
+today = date.today()        # a date:      e.g. date(2026, 7, 12)
+now = datetime.now()        # a datetime:  date + time of day
+
+# Fixed values are built by component
+d = date(2026, 7, 12)
+dt = datetime(2026, 7, 12, 9, 30)      # year, month, day, hour, minute
+d.year, d.month, d.day      # (2026, 7, 12)
+d.weekday()                 # 6 -> Monday is 0 ... Sunday is 6
+
+# Arithmetic: timedelta is a DURATION; +/- shift dates, - gives gaps
+d + timedelta(days=1)       # date(2026, 7, 13)
+d + timedelta(weeks=2)      # date(2026, 7, 26)
+deadline = datetime(2026, 12, 31, 23, 59)
+(deadline - dt).days        # 172 -> subtraction yields a timedelta
+d < date(2026, 12, 25)      # True -> comparisons just work
+
+# Object -> string: strftime ("string format time")
+dt.strftime("%Y-%m-%d")          # '2026-07-12'
+dt.strftime("%d/%m/%Y %H:%M")    # '12/07/2026 09:30'
+dt.isoformat()                   # '2026-07-12T09:30:00'
+
+# String -> object: strptime ("string parse time") — the reverse
+datetime.strptime("12/07/2026 09:30", "%d/%m/%Y %H:%M")
+# datetime(2026, 7, 12, 9, 30)
+datetime.fromisoformat("2026-07-12T09:30:00")   # shortcut for ISO strings
+
+# All of the above are NAIVE (no timezone attached). For aware objects:
+from datetime import timezone
+utc_now = datetime.now(timezone.utc)    # tzinfo=UTC -> comparable across
+                                        # zones; prefer aware in real apps
+```
